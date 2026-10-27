@@ -1,0 +1,668 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks,hypertexnames=false]{hyperref}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+
+\title{The wave-packet solution, derived --- essential path only}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+This is the middle-length version: every load-bearing step from the model (Adams 2024, Eqs. 3.34--3.42) to the packet solution $P_{cv} = \bar P + \delta\cos\phi$, shown in full --- and nothing that is not on that path. Cut relative to \texttt{expander\_two\_timescale\_notes.md} (the full notes): the enthalpy identity and its cycle average, entropy remarks, the cross-checks (energy method, admittance equivalence, exact-root comparison), the third root, dropped-term ledgers, and validation detail. When you want any of those, the full notes have them; section numbers there are cited in brackets.
+
+This version carries the gas leaving through the outlet reed at the temperature the CV gas actually has when it leaves, which follows the pressure adiabatically within a cycle (sections 4, 5, 7 and 9), and adds the stability of the steady oscillation (section 10). Equations added for the outlet temperature carry a letter, (10a), (13a), (16a), (17a); the equations they modify keep their numbers.
+
+\section*{0. Strategy}
+
+The simulated signal is a fast oscillation whose amplitude and mean drift slowly --- a wave packet. The plan, in four moves. \textbf{(i)} Split every variable into a cycle mean plus a fast oscillating, first harmonic with slowly varying amplitude. \textbf{(ii)} On the fast timescale the valves barely act, so one cycle is a sealed gas oscillation --- that fixes the fact frequency $\omega(\bar P)$, its slowly varying height is the envelope --- here the raw 100 to 130 Hz wiggle versus the slow growth and collapse of its amplitude). The same sealed cycle fixes how the CV temperature swings with the pressure, which is what the outflow carries. \textbf{(iii)} The small once-per-cycle valve response, projected onto the first harmonic, acts as gain or loss on the oscillation --- that fixes the envelope rate $\lambda$. \textbf{(iv)} The cycle average of the equations fixes the drift of the mean $\bar P$. The output is three slow ODEs; the packet is rebuilt from their solution.
+
+\section*{1. The model}
+
+CV with inlet/outlet reed valves; gas piston (mass $m$, face area $A$, damping $b$) between the CV and a sealed passive gas volume. I summarize the equations in this section.
+
+\begin{equation}
+\frac{dM}{dt} = \dot{m}_{in} - \dot{m}_{out} \tag{1}
+\end{equation}
+
+This is the mass conservation relationship. $M$ is the mass of the control volume.
+
+\begin{equation}
+\frac{dE}{dt} = -P\frac{dV}{dt} + \dot{m}_{in}c_pT_{in} - \dot{m}_{out}c_pT \tag{2}
+\end{equation}
+
+This is the change in energy, due to work done by the control volume and enthalpy flows. $P$ is the pressure in the control volume. $T_{in}$ is the inlet temperature, which can be taken to ambient. $T$ is the temperature of control volume. $V$ is the volume of the control volume. The outflow carries $c_pT$, the enthalpy of the CV gas at the instant it leaves; the full simulation integrates (2) with the instantaneous $T$, and the averaged model below keeps it.
+
+\begin{equation}
+E = c_vMT, \qquad PV = MRT \tag{3}
+\end{equation}
+
+These two are thermodynamic relationships. Of course, we assume ideal gas.
+
+$m_{slug}$ is the mass of a slug, with fixed mass and volume, sitting in between the control and passive volume. It oscillates back and forth in the resonator, and follows Newton's laws. The position of the slug is $x$. $b$ is the damping parameter, assumed to be fixed during oscillations. $V_{0c}$ is the equilibrium volume of the control volume.
+
+\begin{equation}
+m_{slug}\ddot x + b\dot x = (P - P_{pass})A, \qquad V = V_{0c} + Ax \tag{4}
+\end{equation}
+
+\begin{equation}
+P_{pass}(x) = P_{p0}\left(\frac{V_{0p}}{V_{0p} - Ax}\right)^{\gamma} \tag{5}
+\end{equation}
+
+\begin{equation}
+\dot{m}(\Delta P) = c_1\dot m_{max}(1-u)\sqrt{u} \quad \text{for } 0 < u < 1, \quad \text{else } 0; \qquad u = \frac{\Delta P}{\Delta P_{max}}, \quad c_1 = \frac{3\sqrt 3}{2} \tag{6}
+\end{equation}
+
+with $ \dot{m}_{in} =  \dot{m}(P_{in}-P)$, $ \dot{m}_{out} =  \dot{m}(P-P_{out})$, plenum conditions $P_{in}, T_{in}, P_{out}$ fixed, and $R = c_p - c_v$, $\gamma = c_p/c_v$. (The reed law of the simulation also has a reverse branch, $\dot m = -c_1\dot m_{max}(1-u)\sqrt{\lvert u\rvert}$ for $u \le 0$, a small backflow; it matters for the steady swing and is taken up in section 10.)
+
+\section*{2. The model as one pressure equation}
+
+From (3), we rearrange to get
+\[
+MT = PV/R
+\]
+ and hence
+
+\[
+E = \frac{c_v}{R}PV
+\]
+
+ Differentiate with respect to time and insert into (2), we get:
+
+\[
+\frac{c_v}{R}\dot PV + \frac{c_v}{R}P\dot V = -P\dot V + c_p(F_{in}T_{in} - F_{out}T)
+\]
+
+Collect the $P\dot V$ terms using $1 + c_v/R = c_p/R$, then multiply by $R/(c_vV)$ using $(R/c_v)c_p = \gamma R$:
+
+\begin{equation}
+\frac{dP}{dt} = \frac{\gamma R}{V}\left(F_{in}T_{in} - F_{out}T\right) - \gamma\frac{P}{V}\frac{dV}{dt} \tag{7}
+\end{equation}
+
+This is the whole thermodynamics of the CV in one line: enthalpy fluxes in, boundary work out.
+
+We can also derive a useful property. When the flow of enthalpy is small and negligible, we can assume isentropic expansion
+
+\begin{equation}
+\dot P/P = -\gamma\dot V/V \tag{8}
+\end{equation}
+, i.e.
+
+\[
+PV^{\gamma} = \mathrm{const}
+\]
+
+\section*{3. The split}
+
+Write every variable as slow cycle mean ($\bar P(t)$) plus first harmonic $(P'(t))$ with slowly varying complex amplitude $\hat p(t)$:
+
+\begin{equation}
+P(t) = \bar P(t) + P'(t), \qquad P' = \mathrm{Re}\left[\hat p(t)e^{i\phi(t)}\right], \qquad \dot\phi = \omega(\bar P), \qquad \delta = \lvert\hat p\rvert \tag{9}
+\end{equation}
+
+and the same for $T, M, x, V$ ($a = \lvert\hat x\rvert$). The split is meaningful because, as we see from simulations, there are two different time scales: the fast oscillation of the resonator (100Hz and higher) and the slow, filling or discharging of the entire chamber (1 - 10 Hz). Over one cycle we write $P(\psi) = \bar P + \delta\cos\psi$ with the phase $\psi$.
+
+\section*{4. Analyzing one cycle: approximation is that the system is sealed.}
+
+To leading order the fast motion obeys the isentropic relation (8), because the mass in flow from the valves during one cycle is assumed to be a lot smaller than the total mass $M$. Linearize it about the cycle mean --- expand $(\bar P + P')(\bar V + V')^\gamma$ to first order --- and use $V' = Ax'$:
+
+\begin{equation}
+\frac{P'}{\bar P} + \gamma\frac{V'}{\bar V} = 0 \qquad\Longrightarrow\qquad P' = -\frac{k_{cv}}{A}x', \qquad k_{cv} = \frac{\gamma\bar PA^2}{\bar V_{cv}} \tag{10}
+\end{equation}
+
+The CV pushes back on the piston like a spring of constant $k_{cv}$ (force $= AP' = -k_{cv}x'$). Now name the amplitudes: just as $\delta = \lvert\hat p\rvert$ is the pressure amplitude, $a = \lvert\hat x\rvert$ is the amplitude of the piston's displacement oscillation, in meters. Taking magnitudes of (10) converts one into the other:
+
+\begin{equation}
+\delta = \frac{k_{cv}a}{A} \tag{11}
+\end{equation}
+
+We utilize the mass-spring system analogy to help us derive the equation of motion later in the section.
+
+Linearizing the passive adiabat (5) the same way gives the second spring, $k_{pass} = \gamma\bar P_{pass}A^2/\bar V_{pass}$. The piston between two gas springs oscillates at
+
+\begin{equation}
+\omega(\bar P) = \sqrt{\frac{k_{cv}+k_{pass}}{m}} = A\sqrt{\frac{\gamma\bar P}{m}\left(\frac{1}{\bar V_{cv}} + \frac{1}{\bar V_{pass}}\right)} \tag{12}
+\end{equation}
+
+(second form uses $\bar P_{pass} = \bar P$, from the quasi-static piston of section 7).
+
+\textbf{The temperature over one cycle.} The same sealed cycle fixes the temperature. With $M$ constant over the cycle, $PV^{\gamma} = \mathrm{const}$ and $PV = MRT$ give $T \propto PV \propto P^{1-1/\gamma}$, so
+
+\begin{equation}
+\frac{T}{\bar T} = \left(\frac{P}{\bar P}\right)^{\varepsilon}, \qquad \varepsilon = \frac{\gamma-1}{\gamma}, \qquad\text{and to first order}\qquad \frac{T'}{\bar T} = \varepsilon\,\frac{P'}{\bar P} . \tag{10a}
+\end{equation}
+
+On the first harmonic,
+
+\begin{equation}
+T(\psi) = \bar T\left(1 + \frac{\delta}{\bar P}\cos\psi\right)^{\varepsilon} . \tag{10b}
+\end{equation}
+
+Here $\bar T$ is the mean-gas-law temperature $\bar T = \bar P\bar V_{cv}/\bar MR$ of section 7; the temperature at the mean pressure and the cycle average of $T$ differ from it only at order $(\delta/\bar P)^2$, which (10b) does not resolve. The temperature swings in phase with the pressure, by $\varepsilon\bar T\delta/\bar P = \pm 4.3$ K at the steady swing of the baseline, as in the full simulation. The relation (10a) holds in the full simulation: within cycles, $\ln T$ against $\ln P$ has slope 0.2784, the model's adiabatic exponent, with 1 to 3 mK of scatter, both during growth and on the steady oscillation. (The notebooks' constants have $R \ne c_p - c_v$; for $E = c_vMT$ and $PV = MRT$ the adiabatic exponent is then $R/(c_v + R) = 0.278$, which is $(\gamma - 1)/\gamma$ when $R = c_p - c_v$.) The only approximation in (10b) is the pure cosine for $P(\psi)$.
+
+\section*{5. The valve feedback}
+
+\subsection*{5.1 Small amplitude: the tangent slope}
+
+We define $\Delta\bar P_{in} = P_{in} - \bar P$ and $\Delta\bar P_{out} = \bar P - P_{out}$. This describes how far is the average pressure oscillation from the inlet and outet pressure, respectively.
+
+\begin{equation}
+\dot{m}_{in} \approx \bar {\dot{m}}_{in} + \frac{d\dot{m}_{in}}{dP'}P', \qquad \dot{m}_{out} \approx \bar {\dot{m}}_{out} + \frac{d\dot{m}_{out}}{dP'}P' \tag{13}
+\end{equation}
+
+The outflow's enthalpy flux contains the product $\dot m_{out}T$. Multiply (13) by $T = \bar T + T'$, drop the product of two fluctuations, and use $T' = \varepsilon\bar TP'/\bar P$ from (10a) for the term $\bar{\dot m}_{out}T'$:
+
+\begin{equation}
+\dot m_{out}T \approx \bar{\dot m}_{out}\bar T + \bar T\frac{d\dot m_{out}}{dP'}P' + \bar{\dot m}_{out}T'
+= \bar{\dot m}_{out}\bar T + \bar T\left(\frac{d\dot m_{out}}{dP'} + \varepsilon\frac{\bar{\dot m}_{out}}{\bar P}\right)P' . \tag{13a}
+\end{equation}
+
+So $\bar{\dot m}_{out}T'$ is the second term in the bracket: because the CV temperature swings in phase with the pressure, it is proportional to $P'$, and it joins the valve term below.
+
+Now substitute everything into (7): $P = \bar P + P'$, $T = \bar T + T'$, $V = \bar V_{cv} + Ax'$, $\dot V = d\bar V_{cv}/dt + A\dot x'$, the flows (13) and (13a), and the prefactor $1/V = (1/\bar V_{cv})(1 - Ax'/\bar V_{cv} + \dots)$. Multiplying out to first order in the fluctuations, every term on the right hand side of equation 7 can be divided out to be 3 types, interms of oscillation speed. Purely slow, no oscillating factor:
+
+\[
+\frac{\gamma R}{\bar V_{cv}}\left(T_{in}\bar {\dot{m}}_{in} - \bar T\bar {\dot{m}}_{out}\right) - \frac{\gamma\bar P}{\bar V_{cv}}\frac{d\bar V_{cv}}{dt}
+\]
+
+Oscillating, linear in one fluctuation:
+
+\[
+-\frac{\gamma\bar PA}{\bar V_{cv}}\dot x' + \frac{\gamma R}{\bar V_{cv}}\left[T_{in}\frac{d\dot{m}_{in}}{dP'} - \bar T\left(\frac{d\dot{m}_{out}}{dP'} + \varepsilon\frac{\bar{\dot m}_{out}}{\bar P}\right)\right]P' + \left[-\frac{\gamma R}{\bar{V}^2} \bar{S} V' - \gamma \frac{\dot{\bar{V}}}{\bar{V}} P'\right]
+\]
+
+We can either numerically check the terms in the bracket and find that they are small compared to the terms NOT in the bracket. Another way to illustrate why we only keep the terms not in the bracket is that, we have to account for the "external drives", in this calse the block and the valves. The rest of the terms are the resonator's own feedback on the system. (The term $\gamma R\bar{\dot m}_{out}T'/\bar V$, which stood in the bracket when the outflow carried $\bar T$, has moved into the valve term through (13a).) The size of the bracket can also be read off directly: with $V' = -(\bar V_{cv}/\gamma\bar P)P'$ from (10) and $\bar S \approx \bar T\dot m_{net}$ it is $[\dot m_{net}/\bar M - \gamma\dot{\bar V}_{cv}/\bar V_{cv}]P'$, the fractional rates at which the mean mass and the mean volume change --- about 0.1 per second in the baseline, the slow timescale by definition. The valve term's rate, $(\gamma R/\bar V_{cv})\,d\dot m/dP' \approx \gamma(c_1\dot m_{max}/\bar M)(\bar P/\Delta P_{max})$, is the same flow-over-mass scale amplified by $\bar P/\Delta P_{max} \approx 12$, because a reed's flow changes by its full size over a pressure change of $\Delta P_{max}$ while $1/V$ and $\dot{\bar V}_{cv}$ change by theirs only over a change of order $\bar P$; it is 27 per second.
+
+Quadratic in two fluctuations, for example $\gamma AP'\dot x'/\bar V_{cv}$: a product of two first harmonics contains only a constant part and a second harmonic, according to trignometric properties, nothing resonating with the fast frequency, so it contributes nothing here --- its constant part is saved for section 7. The left side splits the same way, $dP/dt = d\bar P/dt + dP'/dt$.
+
+If we isolate the slow part, we would get
+
+\[
+\frac{d\bar P}{dt} = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}\bar {\dot{m}}_{in} - \bar T\bar {\dot{m}}_{out}\right) - \frac{\gamma\bar P}{\bar V_{cv}}\frac{d\bar V_{cv}}{dt} + \text{quadratic means}
+\]
+
+is set aside for section 7, where we would incorporate this section's result into this equation.
+
+Using the notation $\gamma\bar PA/\bar V_{cv} = k_{cv}/A$ from (10), and $\gamma R\bar T/(\bar V_{cv}\bar P) = \gamma/\bar M$ from the mean gas law,
+
+\begin{equation}
+\begin{gathered}
+\frac{dP'}{dt} = -\frac{k_{cv}}{A}\frac{dx'}{dt} + gP', \\
+g = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}\frac{d\dot{m}_{in}}{dP'} - \bar T\frac{d\dot{m}_{out}}{dP'}\right) - \frac{\gamma\varepsilon\,\bar{\dot m}_{out}}{\bar M}
+= -\frac{\gamma R}{\bar V_{cv}}\left(T_{in}\dot m'_{in} + \bar T\dot m'_{out}\right) - \frac{\gamma\varepsilon\,\bar{\dot m}_{out}}{\bar M}
+\end{gathered} \tag{14}
+\end{equation}
+
+The first term is the gas spring of (10); the second term describes the valve's effect on the pressure fluctuation, in phase with the oscillation itself. The last term is the temperature swing of the leaving gas, and it is negative whenever gas leaves: the gas is warmer at the pressure peaks than at the troughs, so the outflow removes more enthalpy --- and hence more pressure --- when the pressure is high, a small extra damping ($\gamma\varepsilon\bar{\dot m}_{out}/\bar M = 0.16$ per second at the start of the baseline, 0.6 percent of the valve gain; the reeds respond to the pressure on the scale $\Delta P_{max}$, the temperature on the scale $\bar P/\varepsilon$, and $\varepsilon\Delta P_{max}/\bar P = 0.022$ in the baseline).
+
+\begin{equation}
+\dot m'(\Delta P) \equiv \frac{d\dot m}{d\Delta P} = \frac{c_1\dot m_{max}}{\Delta P_{max}}\cdot\frac{1 - 3u}{2\sqrt u} \tag{15}
+\end{equation}
+
+negative on the falling branch $\frac13 < u < 1$ (valve pumps, $g > 0$), positive on the rising branch (valve damps), zero when closed.
+
+\subsection*{5.2 Finite amplitude: the first-harmonic gain}
+
+$F$ only depends on $\Delta P = \Delta \bar{P} + \delta \cos\psi$, where $\Delta P$ is the pressure of the control volume relative to the middle point of the valve curves. If we just focus on the fast part of the oscillation, then we can assume $ \Delta \bar{P}$ stays the same, and we can write $\dot m$ as a function of $\psi$. Because $\Delta P$ is an even function of $\psi$
+
+Hence we can expand
+
+\[
+\dot m(\psi) = \dot m_{0} + \dot m_{1} \cos \psi + \dot m_{2} \cos 2 \psi + \ldots
+\]
+
+We can then find out that the $\dot m_1$ term is proportional to pressure. $\dot m_0$ is the constant term that contributes to the slow growing term.
+
+To illustrate why only $\dot m_1$ matters, we look at the equation. If we assume $\psi = \omega t$, then we can integrate with respect to time to get
+
+\[
+\frac{d P}{d t}=\frac{\gamma R}{V}\left(T_{in} \dot m_{in} - T_{out} \dot m_{out}\right) + \cdots
+\]
+
+\begin{align*}
+P &= \frac{\gamma R T_{in}}{V}\left(\dot m_0 t + \frac{1}{\omega} \dot m_1 \cos \omega t + \frac{1}{2\omega} \dot m_2 \cos 2 \omega t + \ldots\right)_{in} \\
+&\quad - \frac{\gamma R T_{out}}{V} \left(\dot m_0 t + \frac{1}{\omega} \dot m_1 \cos \omega t + \frac{1}{2\omega} \dot m_2 \cos 2 \omega t + \ldots\right)_{out} + \cdots
+\end{align*}
+
+Only the $\cos(\omega t)$ term follows the speed/frequency of the oscillation. Other terms contributes to higher harmonics that oscillates faster than the quantity that we care about, namely $P'$, Therefore resulting in smaller driving effect.
+
+Define the following to be the DIFFERENCE of pressure between the valves and the pressure inside the chamber, we have
+\[
+\Delta P_{in}(\psi) = \Delta\bar P_{in} - \delta\cos\psi, \qquad \Delta P_{out}(\psi) = \Delta\bar P_{out} + \delta\cos\psi,
+\]
+and each flow, $\dot m_{in}(\psi) = \dot m(\Delta P_{in}(\psi))$ and $\dot m_{out}(\psi) = \dot m(\Delta P_{out}(\psi))$, is an even periodic function of $\psi$, hence a cosine series:
+\begin{align*}
+\dot m_{in}(\psi) &= \dot m_{0,in} + \dot m_{1,in}\cos\psi + \dot m_{2,in}\cos 2\psi + \cdots, \\
+\dot m_{out}(\psi) &= \dot m_{0,out} + \dot m_{1,out}\cos\psi + \dot m_{2,out}\cos 2\psi + \cdots
+\end{align*}
+with coefficients
+\begin{equation}
+\begin{aligned}
+\dot m_{0,in} &= \frac{1}{2\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{in} - \delta\cos\psi\right)d\psi, &
+\dot m_{n,in} &= \frac{1}{\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{in} - \delta\cos\psi\right)\cos n\psi\,d\psi, \\
+\dot m_{0,out} &= \frac{1}{2\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)d\psi, &
+\dot m_{n,out} &= \frac{1}{\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)\cos n\psi\,d\psi .
+\end{aligned} \tag{16}
+\end{equation}
+The first-harmonic gains with respect to $P'$ are
+\[
+N_{in} \equiv \frac{\dot m_{1,in}}{\delta}, \qquad N_{out} \equiv \frac{\dot m_{1,out}}{\delta},
+\]
+so that, keeping the mean and the fundamental of each flow,
+\[
+\dot m_{in} \approx \dot m_{0,in} + N_{in}P', \qquad \dot m_{out} \approx \dot m_{0,out} + N_{out}P',
+\]
+which is (13) with the tangent slopes $d\dot m/dP'$ replaced by the finite-amplitude gains.
+
+The outlet enters (7) through the product $\dot m_{out}(\psi)T(\psi)$, which is also an even function of $\psi$. Write $\Delta H$ for its coefficients, with $T(\psi)$ from (10b) ($\Delta H$ is a temperature-weighted mass flow, not an enthalpy; $c_p\Delta H_{0,out}$ is the enthalpy flow through the outlet):
+\begin{equation}
+\begin{aligned}
+\Delta H_{0,out} &= \frac{1}{2\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)T(\psi)\,d\psi, \\
+\Delta H_{n,out} &= \frac{1}{\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)T(\psi)\cos n\psi\,d\psi ,
+\end{aligned} \tag{16a}
+\end{equation}
+so that, keeping the mean and the fundamental, $\dot m_{out}T \approx \Delta H_{0,out} + (\Delta H_{1,out}/\delta)P'$, which is (13a) at finite amplitude. Substituting into (7) exactly as in section 5.1 gives
+\begin{equation}
+g(\bar P,\delta) = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}N_{in} - \frac{\Delta H_{1,out}}{\delta}\right) . \tag{17}
+\end{equation}
+The outlet's temperature-weighted gain $\Delta H_{1,out}/\delta$ takes the place of $\bar TN_{out}$. Since $\delta/\bar P$ stays below about 0.05, the temperature can be taken to first order, $T(\psi) \approx \bar T(1 + \varepsilon\delta\cos\psi/\bar P)$, while the flow is kept exact. Then
+\begin{equation}
+\frac{\Delta H_{1,out}}{\delta} = \bar T\left[N_{out} + \frac{\varepsilon}{\bar P}\left(\dot m_{0,out} + \frac{\dot m_{2,out}}{2}\right)\right], \qquad
+\Delta H_{0,out} = \bar T\left(\dot m_{0,out} + \frac{\varepsilon\delta^2}{2\bar P}N_{out}\right) , \tag{17a}
+\end{equation}
+with $\dot m_{2,out}$ the second harmonic from (16). As $\delta \to 0$, $N_{in} \to d\dot m_{in}/dP' = -\dot m'(\Delta\bar P_{in})$, $\dot m_{2,out} \to 0$ and $N_{out} \to d\dot m_{out}/dP' = +\dot m'(\Delta\bar P_{out})$, and (17) reduces to (14). In numerical work (16a) is evaluated on the same grid in $\psi$ as (16), with one extra multiplication by $T(\psi)$.
+
+Physically, the outlet passes most of its gas in the low-pressure half of the cycle: on its falling branch ($u_{out} > \tfrac13$) its flow rises as the CV pressure falls, and at large swings it is pressed shut near the pressure peaks. That is when the gas is cooler than $\bar T$. In the full simulation the flow-weighted temperature of the leaving gas is 0.8 K below $\bar T$ on the steady oscillation of the baseline and up to 2 K below while an oscillation grows; $\Delta H_{0,out}/\dot m_{0,out}$ is its counterpart in the averaged model, and reproduces it to 0.05 K while an oscillation grows and stalls and to 0.3 K on the steady oscillation (the residual is the pure cosine in (10b); applied to the simulated waveform, which has a 2.6 percent second harmonic, the adiabatic relation gives 0.04 K).
+
+\section*{6. The envelope law}
+
+\subsection*{6.1 The fast system and its characteristic cubic}
+
+The fast dynamics are now two equations --- (14) for the pressure fluctuation, and the fluctuating part of the piston equation (4), with the passive spring linearized:
+
+\begin{equation}
+\frac{dP'}{dt} = -\frac{k_{cv}}{A}\dot x' + gP', \qquad m\ddot x' + b\dot x' + k_{pass}x' = AP' \tag{18}
+\end{equation}
+
+Eliminate $P'$: differentiate the piston equation once, substitute $\dot P'$ from the first, then use the piston equation again to replace $AP'$. Writing $k = k_{cv}+k_{pass}$:
+
+\[
+m\dddot x' + (b - gm)\ddot x' + (k - gb)\dot x' - gk_{pass}x' = 0
+\]
+
+If we assuming an exponential growth and wavepacket ansatz for $x'$, namely $x' \propto e^{st}$, we require
+
+\begin{equation}
+ms^3 + (b - gm)s^2 + (k - gb)s - gk_{pass} = 0 \tag{19}
+\end{equation}
+
+We assume
+\[
+s = i\omega_0 + \lambda, \qquad \lambda \text{ small and a priori complex}
+\]
+
+\subsection*{6.2 Solving the cubic perturbatively}
+
+With $b = g = 0$, (19) is $s(ms^2 + k) = 0$: exact roots $0$ and $\pm i\omega_0$, $\omega_0^2 = k/m$ --- the undamped oscillator. The perturbations are tiny on the oscillator scale, for the following reaons. $b/m = \omega_0/Q$ is small because the resonator has low damping. $g$ is small because the valves are tiny orifices feeding a large reservoir.
+
+Hence $\lambda$, which describe the growth rate of the gas inside, is small compared to $\omega$.
+
+Dropping quadratic-in-small terms: $s^2 = -\omega_0^2 + 2i\omega_0\lambda$ and $s^3 = -i\omega_0^3 - 3\omega_0^2\lambda$. Substitute into (19) and discard all products of two small quantities ($gb$, $\lambda b$, $\lambda g$, $\lambda^2$):
+
+\[
+\left[ik\omega_0 - im\omega_0^3\right] + \left[-3m\omega_0^2\lambda + k\lambda - (b - gm)\omega_0^2 - gk_{pass}\right] = 0
+\]
+
+We then separate the real and imaginary parts.
+
+\[
+-2m\omega_0^2\lambda = (b - gm)\omega_0^2 + gk_{pass}
+\]
+
+The imaginary part is automatically satisfied. The real part gives the solution
+
+\begin{equation}
+\lambda = -\frac{b}{2m} + \frac{g}{2}\cdot\frac{k_{cv}}{k_{cv}+k_{pass}} \tag{20}
+\end{equation}
+
+(the last step uses $m\omega_0^2 = k$ to combine $\frac g2 - \frac g2\frac{k_{pass}}{k} = \frac g2\frac{k_{cv}}{k}$). With $b = m\omega_0/Q$ the loss term is $\omega_0/2Q$. At finite amplitude $g = g(\bar P, \delta)$ from (17) --- the formula survives because its derivation used only linearity in the first harmonics, which (16) and (16a) preserve by construction.
+
+\subsection*{6.3 From growth rate to envelope}
+
+From simulation, we have seen that $\omega(t)$ only varies by less than 1\% throughout the entire oscillation. Hence we neglect the effect of a varying $\omega$, especially on the change in amplitude of the oscillation. I have commented out the section in the latex code.
+
+We have simply the growth rate to be
+
+\begin{equation}
+\frac{da}{dt} = \left[\lambda(\bar P, \delta)\right]a \tag{21}
+\end{equation}
+
+which integrates to
+
+\begin{equation}
+\delta(t) = \delta(0)\cdot\exp\left(\int_0^t\lambda(\bar P,\delta)dt'\right) \tag{22}
+\end{equation}
+
+Growth while $\lambda > 0$, decay while $\lambda < 0$; and because $N$ depends on $\delta$, the condition $\lambda(\bar P, \delta) = 0$ is solvable for $\delta$ --- the envelope self-limits, which is where limit cycles come from.
+
+\section*{7. The packet center}
+
+What remains is the slow drift of the mean state. Two averaging facts do all the work below: the average of a lone oscillating factor is zero, and the average of a product of two oscillations keeps only their in-phase combination, worth one half of amplitude times amplitude.
+
+\subsection*{7.1 Mass}
+
+Average equation (1). Over one cycle the inflow waveform averages, by the definition (16), to exactly $F_{0,in}$ --- likewise the outlet:
+
+\begin{equation}
+\frac{d\bar M}{dt} = \dot m_{0,in} - \dot m_{0,out} \tag{23}
+\end{equation}
+
+Recall that the mass flow is averaged for each cycle.
+
+\subsection*{7.2 The flux term of the pressure equation}
+
+Average the first term of (7). Replace $1/V$ by $1/\bar V_{cv}$. The product of its oscillatory part with the flows is small, as justified by numerical results. The outflow keeps the adiabatic temperature $T(\psi)$ of (10b), and the cycle average of $\dot m_{out}T$ is exactly $\Delta H_{0,out}$ of (16a):
+
+\[
+\left\langle\frac{\gamma R}{V}\left(\dot m_{in}T_{in} - \dot m_{out}T\right)\right\rangle = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}\dot m_{0,in} - \Delta H_{0,out}\right)
+\]
+
+\subsection*{7.3 The work term: displacement work plus acoustic power}
+
+Write $P = \bar P + P'$ and $\dot V = d\bar V_{cv}/dt + \dot V'$ and multiply out. Four products: the two cross terms each contain one lone oscillating factor and average to zero; what survives is
+
+\[
+\left\langle P\dot V\right\rangle = \bar P\frac{d\bar V_{cv}}{dt} + \left\langle P'\dot V'\right\rangle
+\]
+
+The second term needs one short computation. If the pressure fluctuation were purely the gas-spring response (10), $P' \propto -x'$, it would be a quarter cycle out of phase with the velocity $\dot x'$ --- velocity is the derivative of displacement, and differentiating a sinusoid shifts its phase by a quarter cycle ($x' \propto \cos\phi$ gives $\dot x' \propto -\sin\phi$)
+
+However, we have some correction from the fast pressure equation (14), due to the effect of the reed valves. We make the substitution $P' = \mathrm{Re}[\hat pe^{i\phi}]$, $x' = \mathrm{Re}[\hat xe^{i\phi}]$, so $d/dt \to i\omega$):
+
+\[
+i\omega\hat p = -\frac{k_{cv}}{A}i\omega\hat x + g\hat p \qquad\Longrightarrow\qquad \hat p = -\frac{k_{cv}}{A}\hat x + i\frac{gk_{cv}}{\omega A}\hat x + O(g^2/\omega^2)
+\]
+
+The first piece is the spring --- in phase with $x'$, no net work. The second carries a factor $i$: shifted a quarter cycle, hence in phase with the velocity --- this is the term does work. With the product rule $\langle q_1q_2\rangle = \frac{1}{2}\mathrm{Re}[\hat q_1\hat q_2^*]$ and velocity amplitude $i\omega\hat x$:
+
+\begin{equation}
+\left\langle P'\dot V'\right\rangle = A\left\langle P'\dot x'\right\rangle = \frac{gk_{cv}}{2}a^2 = \frac{g\bar V_{cv}}{2\gamma\bar P}\delta^2 \tag{24}
+\end{equation}
+
+(conversion by (11) and the definition of $k_{cv}$). Sign reading: when $g > 0$ the mean state loses pressure paying for the growing oscillation; during decay, $g < 0$, the oscillation pays it back.
+
+\subsection*{7.4 The mean piston: quasi-static balance}
+
+Average the piston equation (4): $m \cdot d^2\bar x/dt^2 + b \cdot d\bar x/dt = A(\bar P - \bar P_{pass})$. The left side involves only slow rates --- smaller than the pressure-force scale by order $\varepsilon$ and $\varepsilon^2$ --- so to leading order the mean piston position sits, at every instant, where the two mean pressures balance:
+
+\[
+\bar P_{pass}(\bar x) = \bar P
+\]
+
+As the CV charges, the piston slides toward the passive side, compressing it until its pressure catches up (this drifting equilibrium is what a rolling-median baseline tracks). Because the passive side is the sealed adiabat (5), the balance inverts in closed form:
+
+\begin{equation}
+\bar V_{pass} = V_{0p}\left(\frac{P_{p0}}{\bar P}\right)^{1/\gamma}, \qquad \bar V_{cv} = V_{0c} + V_{0p} - \bar V_{pass}, \qquad \frac{d\bar V_{cv}}{d\bar P} = \frac{\bar V_{pass}}{\gamma\bar P} \tag{25}
+\end{equation}
+
+The middle relation holds because the total geometric volume $V_{0c} + V_{0p}$ is fixed: whatever the passive side loses, the CV gains. The derivative is kept because 7.5 needs it.
+
+\subsection*{7.5 Assemble}
+
+Insert 7.2 and 7.3 into the average of (7):
+
+\[
+\frac{d\bar P}{dt} = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}\dot m_{0,in} - \Delta H_{0,out}\right) - \frac{\gamma\bar P}{\bar V_{cv}}\frac{d\bar V_{cv}}{dt} - \frac{\gamma}{\bar V_{cv}}\left\langle P'\dot V'\right\rangle
+\]
+
+The middle term is not independent of the left side: by the chain rule and (25), $d\bar V_{cv}/dt = (\bar V_{pass}/\gamma\bar P)(d\bar P/dt)$, so that term equals $(\bar V_{pass}/\bar V_{cv})(d\bar P/dt)$. Move it across and factor:
+
+\[
+\frac{d\bar P}{dt}\left(1 + \frac{\bar V_{pass}}{\bar V_{cv}}\right) = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}F_{0,in} - \Delta H_{0,out}\right) - \frac{g\delta^2}{2\bar P}
+\]
+
+(the last term is (24) times $\gamma/\bar V_{cv}$). Multiply through by $\bar V_{cv}$ and divide:
+
+\begin{equation}
+\frac{d\bar P}{dt} = \frac{\gamma R\left(T_{in}F_{0,in} - \Delta H_{0,out}\right) - \bar V_{cv}g\delta^2/2\bar P}{\bar V_{cv} + \bar V_{pass}} \tag{26}
+\end{equation}
+
+Note that both volumes in (26) are not additional unknowns: they are evaluated from (25) at the current $\bar P$ --- algebraic functions of the mean pressure, recomputed at every instant of the integration (the passive volume from the balance-and-adiabat inversion, the CV volume as the remainder of the fixed total $V_{0c} + V_{0p}$). The effective volume is the sum $\bar V_{cv} + \bar V_{pass}$ because the quasi-static piston transmits pressure: charging the CV inflates both springs, so the mean rises at roughly half the rate a rigid CV would (for equal volumes). The set closes with the mean gas law $\bar T = \bar P\bar V_{cv}/\bar MR$. With (17a), the change against the outflow at $\bar T$ is one more term of order $\delta^2$ in the numerator, $-\gamma R\varepsilon\bar TN_{out}\delta^2/2\bar P$: $N_{out} < 0$ when the outlet passes most of its gas in the low-pressure half of the cycle, so this term raises the mean --- the outflow leaves cool and removes less enthalpy than $\bar T\dot m_{0,out}$. It matters only while the oscillation is large.
+
+\section*{8. The packet, assembled}
+
+Three slow ODEs --- (23) for $\bar M$, (26) for $\bar P$, (21) for $a$ --- with the algebra (25), (12), (20), (17), (16), (16a), (10b) and $\delta = k_{cv}a/A$. Then
+
+\begin{equation}
+P_{cv}(t) = \bar P(t) + \delta(t)\cos\left(\phi_0 + \int_0^t\omega(\bar P)dt'\right) \tag{27}
+\end{equation}
+
+with $T$ and $x$ slaved by section 4. The life of the packet is read off $\lambda$ and the drift: ignition while $\lambda > 0$; a limit cycle where the trajectory settles on the locus $\lambda(\bar P, \delta) = 0$ (your notebook's $V_{0,cv} = 1\times10^{-4}$ case --- amplitude predicted 0.2947 bar, simulated 0.2946); turnover and collapse when the charging mean drags the valves out of their pumping band; a parabolic landing $P_{in} - \bar P \propto (t^\ast - t)^2$ once only the inlet trickles (integrate (26) with $F_0 \propto \sqrt{P_{in}-\bar P}$, substitute $y = \sqrt{P_{in}-\bar P}$); and ring-down $\delta \propto e^{-\omega t/2Q}$ when the valves disengage. Against full simulations, thesis parameters and your notebook's variant alike: mean within 0.003 bar, envelope 1 to 3 percent, frequency within 0.25 Hz.
+
+What the outlet temperature changes, against the full simulation, over the 37 settings of the sweep notebook (\texttt{outlet\_\allowbreak temperature\_\allowbreak check.ipynb}):
+\begin{itemize}
+\item the temperature of the leaving gas is reproduced to within 0.05 K over the 2.5 m/s stall run and to 0.3 K on the steady oscillation of the baseline, where the residual comes from the pure-cosine waveform in (10b); with $\bar T$ at the outlet it is 0.8 to 2 K too warm;
+\item steady oscillations are unchanged: limit-cycle amplitude 0.2946 bar (0.2947 with $\bar T$, simulated 0.2946), mean pressure still 8 mbar high --- not a temperature effect, since the steady mean is set by the mass balance (23), which contains no temperature (section 10.6 traces it to the second harmonic of the simulated waveform);
+\item the growth and stall runs improve: the worst envelope error over a stall run (rms, as a fraction of the largest swing) falls from 101 to 29 percent, the steady/stall outcome agrees with the simulation in all 37 settings (36 with $\bar T$), and the smallest kick that survives moves from 2.48 to 2.53 m/s, against 2.62 m/s in the simulation.
+\end{itemize}
+Figure~\ref{fig:cases} shows three of the settings. In the baseline both treatments follow the simulated swing to a few tenths of a percent and sit 8 mbar above the simulated mean once the oscillation is steady. For the 2.5 m/s kick the race is close: with $\bar T$ at the outlet the averaged model lets the swing climb to the steady value and the mean settle, while the simulation turns over at 0.2 bar and stalls; with the adiabatic temperature the model stalls too, 0.15 s late. With the smaller passive volume both treatments stall, the adiabatic one closer to the simulation.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{fig_outlet_temperature_cases.pdf}
+\caption{Per-cycle half swing (top) and mean pressure (bottom) of the full simulation (dots) against the averaged model with $\bar T$ at the outlet (dashed) and with the adiabatic $T(\psi)$ (solid), for three settings of the sweep notebook. Where the simulated oscillation has died the dots stop; the simulated mean then lands on $P_{in}$.}
+\label{fig:cases}
+\end{figure}
+
+\section*{9. Growth or stall: the e-fold budget}
+
+\subsection*{9.1 The question}
+
+Integrating (21) from the kick to a time $t$ gives $\ln\left(\delta(t)/\delta_0\right) = \int_0^t \lambda\,dt'$ (the factor $k_{cv}(t)/k_{cv}(0)$ of (22) stays within one percent over the times that matter and is dropped). The sign of $\lambda$ at $t = 0$ does not decide the outcome: in the 37 settings of the sweep notebook, 11 of the 14 stall cases start with $\lambda_0 > 0$. What decides it is a race. The oscillation must reach the limit-cycle amplitude $\delta_\infty$ --- the locus $\lambda(\bar P, \delta) = 0$ of section 8 --- before the drift of $\bar P$ carries the reeds out of their pumping band. So the question is how many e-folds $\lambda$ can deliver before the drift takes the drive away, against how many the kick needs, $\ln(\delta_\infty/\delta_0)$.
+
+\subsection*{9.2 The small-amplitude gain is the slope of the net inflow}
+
+We assume $\bar T = T_{in}$ in (14). This is valid because in the beginning, the resonator is in room temperature. Write $c^2 \equiv \gamma RT_{in}$ (the speed of sound squared) for simplicity. We define $\dot m_{net}(\bar P) \equiv \dot m(P_{in} - \bar P) - \dot m(\bar P - P_{out})$. Since $d\dot m(P_{in} - \bar P)/d\bar P = -\dot m'_{in}$ and $d\dot m(\bar P - P_{out})/d\bar P = +\dot m'_{out}$, and $\gamma RT_{in}/(\bar V_{cv}\bar P) = \gamma/\bar M$,
+\begin{equation}
+g_{lin}(\bar P) = -\frac{c^2}{\bar V_{cv}}\left(\dot m'_{in} + \dot m'_{out}\right) - \frac{\gamma\varepsilon\,\dot m_{out}}{\bar M} = \frac{c^2}{\bar V_{cv}}\left(\frac{d\dot m_{net}}{d\bar P} - \varepsilon\frac{\dot m_{out}}{\bar P}\right) . \tag{28}
+\end{equation}
+With (15),
+\begin{equation}
+\frac{d\dot m_{net}}{d\bar P} = \frac{c_1\dot m_{max}}{2\Delta P_{max}}\left[\frac{3u_{in}-1}{\sqrt{u_{in}}} + \frac{3u_{out}-1}{\sqrt{u_{out}}}\right], \qquad u_{in} = \frac{P_{in} - \bar P}{\Delta P_{max}}, \quad u_{out} = \frac{\bar P - P_{out}}{\Delta P_{max}}, \tag{29}
+\end{equation}
+Inserting (28) into (20), with $f \equiv k_{cv}/(k_{cv} + k_{pass}) = \bar V_{pass}/(\bar V_{cv} + \bar V_{pass})$ from (10) and (12),
+\begin{equation}
+\lambda_{lin}(\bar P) = -\frac{b}{2m} - \frac{f}{2}\,\frac{\gamma\varepsilon\,\dot m_{out}}{\bar M} + \frac{f}{2}\,\frac{c^2}{\bar V_{cv}}\,\frac{d\dot m_{net}}{d\bar P} . \tag{30}
+\end{equation}
+The temperature swing of the leaving gas appears as a second damping rate next to the piston's.
+
+\subsection*{9.3 The drift without oscillation}
+
+With $\delta = 0$ and $\bar T = T_{in}$, the rectified flows in (26) are the flows at the mean pressure, $\Delta H_{0,out} = \bar T\dot m_{out}$, and (26) reads
+\begin{equation}
+\frac{d\bar P}{dt} = \frac{\dot m_{net}(\bar P)}{C}, \qquad C \equiv \frac{\bar V_{cv} + \bar V_{pass}}{c^2} . \tag{31}
+\end{equation}
+
+\subsection*{9.4 The budget}
+
+Define $B \equiv \int_0^{t_1}\lambda_{lin}\,dt$, where $t_1$ is the first time at which $\lambda_{lin}$ reaches zero. We define $\bar P(t_1) = \bar P_1$. Because $\lambda_{lin}$ depends on time only through $\bar P$, $t_1$ corresponds to a pressure $\bar P_1$: the root of $\lambda_{lin}(\bar P) = 0$, or, at when the one of the reed is pressed shut and pressure equilibrates with the inlet/outlet pressure --- whichever comes first. With (29) the root condition reads
+\begin{equation}
+\begin{gathered}
+\lambda_{lin}(\bar P) = \Lambda\left[X(\bar P) - X^*(\bar P)\right], \qquad X(\bar P) = h(u_{in}) + h(u_{out}), \\
+h(u) = \begin{cases} \dfrac{3u-1}{\sqrt u}, & 0 < u < 1, \\[6pt] 0, & u \ge 1 \ \text{(reed shut)}, \end{cases}
+\end{gathered} \tag{32a}
+\end{equation}
+\begin{equation}
+\Lambda \equiv \frac{f}{2}\,\frac{c^2}{\bar V_{cv}}\,\frac{c_1\dot m_{max}}{2\Delta P_{max}}, \qquad
+X^*(\bar P) = \frac{2b\bar V_{cv}\Delta P_{max}}{mfc^2c_1\dot m_{max}} + \frac{2\varepsilon\Delta P_{max}}{\bar P}\,(1 - u_{out})\sqrt{u_{out}} , \tag{32b}
+\end{equation}
+where the first part of $X^*$ is the drive the piston damping eats and the second is the drive the temperature term eats ($(1 - u_{out})\sqrt{u_{out}} = \dot m_{out}/c_1\dot m_{max}$, so it vanishes once the outlet is shut). Substituting $dt = C\,d\bar P/\dot m_{net}$ from (31) into the last term of (30),
+\begin{equation}
+\int_0^{t_1}\frac{f c^2}{2\bar V_{cv}}\frac{d\dot m_{net}}{d\bar P}\,dt = \frac{f c^2 C}{2\bar V_{cv}}\int_{\dot m_{net}(P_0)}^{\dot m_{net}(\bar P_1)}\frac{d\dot m_{net}}{\dot m_{net}} = \frac{\bar V_{pass}}{2\bar V_{cv}}\,\ln\frac{\dot m_{net}(\bar P_1)}{\dot m_{net}(P_0)}, \tag{32}
+\end{equation}
+where $P_0 = \bar P(0)$ and the prefactor collapses because $f$ and $C$ contain the same combination of volumes; write $\kappa \equiv fc^2C/2\bar V_{cv} = \bar V_{pass}/2\bar V_{cv}$. The temperature term of (30), with $\bar M = \bar P\bar V_{cv}/RT_{in}$, integrates the same way to $\kappa\varepsilon\int\dot m_{out}/(\bar P\dot m_{net})\,d\bar P$. Hence
+\begin{equation}
+B = \kappa\ln\frac{\dot m_{net}(\bar P_1)}{\dot m_{net}(P_0)} - \frac{b}{2m}\,t_1 - \kappa\varepsilon\int_{P_0}^{\bar P_1}\frac{\dot m_{out}(\bar P)}{\bar P\,\dot m_{net}(\bar P)}\,d\bar P, \qquad t_1 = C\int_{P_0}^{\bar P_1}\frac{d\bar P}{\dot m_{net}(\bar P)} . \tag{33}
+\end{equation}
+The only pieces left to a quadrature are the drift time $t_1$ and the temperature integral, which is a quadrature of the same kind. The criterion is
+\begin{equation}
+B > \ln\frac{\delta_\infty}{\delta_0}: \ \text{steady oscillation}, \qquad B < \ln\frac{\delta_\infty}{\delta_0}: \ \text{stall}, \tag{34}
+\end{equation}
+with $\delta_0 = k_{cv}a_0/A$ the amplitude of the kick ($a_0 = v_0/\omega_0$ for a velocity kick $v_0$).
+
+The interpretation is that, $B$ signifies how much growth is available from the initial kick and initial cycles of valve flow and damping, before the valve stop providing drive. As long as the initial available drive is more than the growth required to reach full swing, the resonator starts. The adiabatic outlet temperature adds one damping rate, proportional to the rate at which gas leaves the CV. In the baseline of the sweep notebooks it lowers $\lambda_{lin}(0)$ from 7.34 to 7.29 s$^{-1}$, raises $X^*$ at $P_0$ from 0.380 to 0.392, and lowers $B$ from 1.45 to 1.44 (from 1.42 to 1.41 when (23) and (26) are integrated with the temperature equation and the moving piston); over the 37 settings of the sweep notebook it lowers $B$ by 0.008 e-folds in the median and by at most 0.03, and changes no verdict of (34).
+
+\section*{10. Stability of the steady oscillation}
+
+\subsection*{10.1 The question}
+
+Suppose the resonator has settled on its steady oscillation and the swing is suddenly made smaller or larger, with the mean pressure, the mass in the CV and the mean piston position left alone. Does the swing return, how fast, and how large a loss does it survive?
+
+The steady oscillation is a fixed point $(\bar M^*, \bar P^*, a^*)$ of the three slow equations: the mass balance (23), $\dot m_{0,in} = \dot m_{0,out}$, fixes $\bar P^*$; the condition $\lambda = 0$ of (20), that is $g^* = b/mf$, fixes $\delta^* = k_{cv}a^*/A$; and $d\bar P/dt = 0$ in (26) fixes $\bar T^*$ and with it $\bar M^*$. Its stability is the stability of this fixed point: linearize the slow system and look at three eigenvalues. Two of them have closed forms, obtained by integrating the Fourier integrals (16) by parts; the third is the flushing rate of the CV.
+
+The numbers below use the outflow at the adiabatic temperature $T(\psi)$ (section 5.2) and the backflow branch of the reed law (section 1), which the simulation has always had; the latter matters here because the steady swing is large enough for both reeds to reverse during part of every cycle. They also keep, in (26), the correlation between the flows and $1/V$ that 7.2 drops: with $1/V = (1/\bar V_{cv})(1 - V'/\bar V_{cv})$, the oscillating part of $(\gamma R/\bar V_{cv})S$ equal to $gP'$ by (14) and $V' = -(\bar V_{cv}/\gamma\bar P)P'$ by (10), its cycle average is $+g\delta^2/2\gamma\bar P$, which multiplies the $\delta^2$ term of (26) by $1 - 1/\gamma$. With it the steady state of (23) and (26) satisfies the energy balance $c_p(T_{in}\dot m_{0,in} - \Delta H_{0,out}) = \langle P'\dot V'\rangle$ and the averaged $\bar T$ stays within 0.2 K of the simulated one (without it, it drifts by 4.7 K over 20 s); it changes the rates below by about a percent.
+
+\subsection*{10.2 The reed law with backflow, and its local slope}
+
+The reed law of the simulation notebooks is (6) with a reverse branch,
+\begin{equation}
+\dot m(\Delta P) = \begin{cases} c_1\dot m_{max}(1-u)\sqrt u, & 0 < u < 1, \\[2pt] -c_1\dot m_{max}(1-u)\sqrt{\lvert u\rvert}, & u \le 0 \ \text{(backflow)}, \\[2pt] 0, & u \ge 1 \ \text{(pressed shut)}, \end{cases} \qquad u = \frac{\Delta P}{\Delta P_{max}} . \tag{35}
+\end{equation}
+Its slope is the same expression on both open branches,
+\begin{equation}
+\dot m'(\Delta P) = -\frac{c_1\dot m_{max}}{2\Delta P_{max}}\,\tilde h(u), \qquad
+\tilde h(u) = \begin{cases} \dfrac{3u-1}{\sqrt{\lvert u\rvert}}, & u < 1, \\[6pt] 0, & u \ge 1 , \end{cases} \tag{36}
+\end{equation}
+where $\tilde h$ is the drive function $h(u)$ of (32a) continued to the backflow branch. There it is negative: a reversed reed is a leak whose flow rises with the pressure drop, a positive conductance, which damps. $\tilde h > 0$ only on the falling branch $\tfrac13 < u < 1$. Along a cycle the reeds see
+\[
+u_{in}(\psi) = \frac{P_{in} - \bar P - \delta\cos\psi}{\Delta P_{max}}, \qquad u_{out}(\psi) = \frac{\bar P - P_{out} + \delta\cos\psi}{\Delta P_{max}},
+\]
+and $\langle\cdot\rangle \equiv \frac{1}{2\pi}\int_0^{2\pi}(\cdot)\,d\psi$ denotes the cycle average.
+
+\subsection*{10.3 The gain at any amplitude}
+
+Take the outlet. Its first-harmonic coefficient in (16) is
+\begin{equation}
+\dot m_{1,out}(\delta) = \frac{1}{\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)\cos\psi\,d\psi , \tag{37a}
+\end{equation}
+and the swing $\delta$ enters only through the argument of $\dot m$. Integrate by parts, with $\cos\psi\,d\psi = d(\sin\psi)$ and, by the chain rule, $\frac{d}{d\psi}\dot m(\Delta\bar P_{out} + \delta\cos\psi) = \dot m'(\Delta\bar P_{out} + \delta\cos\psi)\cdot(-\delta\sin\psi)$:
+\[
+\begin{aligned}
+\dot m_{1,out} &= \frac{1}{\pi}\Big[\dot m\,\sin\psi\Big]_0^{2\pi} - \frac{1}{\pi}\int_0^{2\pi}\dot m'\left(\Delta\bar P_{out} + \delta\cos\psi\right)(-\delta\sin\psi)\sin\psi\,d\psi \\
+&= \frac{\delta}{\pi}\int_0^{2\pi}\dot m'\left(\Delta\bar P_{out} + \delta\cos\psi\right)\sin^2\psi\,d\psi .
+\end{aligned}
+\]
+The boundary term vanishes because $\sin 0 = \sin 2\pi = 0$, and no terms arise at the points where the reed shuts ($u = 1$) or reverses ($u = 0$), because $\dot m$ of (35) is continuous there (it is zero on both sides of each point); $\dot m'$ has integrable $1/\sqrt{\lvert u\rvert}$ singularities at $u = 0$, which is allowed. Dividing by $\delta$, $N_{out} = \dot m_{1,out}/\delta = 2\langle\dot m'_{out}\sin^2\psi\rangle$. The inlet's drop is $\Delta\bar P_{in} - \delta\cos\psi$, so its chain rule carries the opposite sign and $N_{in} = -2\langle\dot m'_{in}\sin^2\psi\rangle$. With (36), $\dot m' = -(c_1\dot m_{max}/2\Delta P_{max})\tilde h$, and $\bar T = T_{in}$, the gain (17) is $g = (c^2/\bar V_{cv})(N_{in} - N_{out}) = (c^2/\bar V_{cv})(c_1\dot m_{max}/\Delta P_{max})\langle(\tilde h_{in} + \tilde h_{out})\sin^2\psi\rangle$, and the growth rate (20) reads
+\begin{equation}
+\begin{gathered}
+\lambda(\bar P,\delta) = \Lambda\left[X(\bar P,\delta) - X^*\right], \\
+X(\bar P,\delta) \equiv 2\left\langle\left[\tilde h\big(u_{in}(\psi)\big) + \tilde h\big(u_{out}(\psi)\big)\right]\sin^2\psi\right\rangle = \frac{2\Delta P_{max}}{c_1\dot m_{max}}\left(N_{in} - N_{out}\right),
+\end{gathered} \tag{37}
+\end{equation}
+with $\Lambda$ and $X^*$ of (32b). This is (32a) at any amplitude: since $2\langle\sin^2\psi\rangle = 1$, $X(\bar P, 0) = h(u_{in}) + h(u_{out})$. The gain is the drive $\tilde h$ averaged over the cycle with the weight $2\sin^2\psi$, which is 2 at mid-swing and 0 at the extremes. The steady swing is where $X(\bar P^*, \delta^*) = X^*$.
+
+With the adiabatic outlet temperature, $\dot m'_{out}$ in these averages is replaced by the slope of the temperature-weighted flow $\dot m_{out}T$,
+\[
+\frac{1}{\bar T}\,\frac{d(\dot m_{out}T)}{d\Delta P_{out}} = \frac{T(\psi)}{\bar T}\left[\dot m'_{out} + \varepsilon\,\frac{\dot m_{out}}{P(\psi)}\right],
+\]
+which is the second term of (32b) spread over the cycle; the numbers below include it (about a percent).
+
+\subsection*{10.4 The amplitude derivative of the gain}
+
+How the gain changes with the swing follows from the same integral (37a), differentiated with respect to $\delta$ instead of integrated by parts. Since $\delta$ appears only inside the argument of $\dot m$, differentiating under the integral sign gives, by the chain rule, $\dot m'\cdot\cos\psi$ in the integrand:
+\begin{equation}
+\frac{d\dot m_{1,out}}{d\delta} = \frac{1}{\pi}\int_0^{2\pi}\dot m'\left(\Delta\bar P_{out} + \delta\cos\psi\right)\cos\psi\cdot\cos\psi\,d\psi = 2\left\langle\dot m'_{out}\cos^2\psi\right\rangle . \tag{38a}
+\end{equation}
+The gain is the quotient $N_{out} = \dot m_{1,out}/\delta$, so
+\begin{equation}
+\delta\,\frac{dN_{out}}{d\delta} = \frac{d\dot m_{1,out}}{d\delta} - \frac{\dot m_{1,out}}{\delta} = 2\left\langle\dot m'_{out}\cos^2\psi\right\rangle - 2\left\langle\dot m'_{out}\sin^2\psi\right\rangle = 2\left\langle\dot m'_{out}\cos 2\psi\right\rangle , \tag{38b}
+\end{equation}
+where the second term is $N_{out}$ in the by-parts form of 10.3 and $\cos^2\psi - \sin^2\psi = \cos 2\psi$. For the inlet the argument is $\Delta\bar P_{in} - \delta\cos\psi$; the chain rule then carries a minus sign in (38a) as it did in 10.3, so $\delta\,dN_{in}/d\delta = -2\langle\dot m'_{in}\cos 2\psi\rangle$. Insert both into $X = (2\Delta P_{max}/c_1\dot m_{max})(N_{in} - N_{out})$ from (37), with $\dot m' = -(c_1\dot m_{max}/2\Delta P_{max})\tilde h$ from (36):
+\begin{equation}
+\begin{aligned}
+\delta\,\frac{\partial X}{\partial\delta} &= \frac{2\Delta P_{max}}{c_1\dot m_{max}}\left(\delta\frac{dN_{in}}{d\delta} - \delta\frac{dN_{out}}{d\delta}\right)
+= -\frac{4\Delta P_{max}}{c_1\dot m_{max}}\left\langle\left(\dot m'_{in} + \dot m'_{out}\right)\cos 2\psi\right\rangle \\
+&= 2\left\langle\left[\tilde h\big(u_{in}(\psi)\big) + \tilde h\big(u_{out}(\psi)\big)\right]\cos 2\psi\right\rangle .
+\end{aligned} \tag{38}
+\end{equation}
+Two checks. At small $\delta$ the reeds stay on one branch over the whole cycle, $\tilde h$ is constant along it and $\langle\cos 2\psi\rangle = 0$, so $\delta\,\partial X/\partial\delta \to 0$: the gain is amplitude-independent in the linear regime, as it must be. At the steady swing of the baseline, (38) evaluated on a fine phase grid agrees with a finite difference of the integrals (16) to 0.2 percent (the notebook).
+
+\emph{Reading.} Since $\cos 2\psi = \cos^2\psi - \sin^2\psi$, (38) is $2\langle\tilde h\cos^2\psi\rangle - 2\langle\tilde h\sin^2\psi\rangle$: the drive at the extremes of the swing, where $\cos^2\psi \approx 1$, minus the drive at mid-swing, where $\sin^2\psi \approx 1$. The gain falls with amplitude exactly when the reeds drive less at the extremes than at mid-swing --- which is what being pressed shut ($\tilde h = 0$) or reversed ($\tilde h < 0$) at the extremes does, while at mid-swing they sit on their falling branches with $\tilde h > 0$.
+
+\emph{Why a falling drive means a stable swing.} A drive that falls with amplitude is not a loss of operation; it is the condition for a steady swing to exist and to be stable. With the mean frozen, (21) reads $d\ln\delta/dt = \lambda(\delta) = \Lambda[X(\delta) - X^*]$. The small-signal drive exceeds the threshold ($X(\bar P^*, 0) = 2.07$ against $X^* = 0.38$ in the baseline), so a small swing grows; it stops growing where $X(\delta)$ has fallen to $X^*$, at $\delta^*$, and there the reeds still supply exactly the drive that the piston damping takes --- only the excess has gone. Now perturb the swing to $\delta = \delta^*(1 + \epsilon)$. Expanding $\lambda$ about $\lambda(\delta^*) = 0$,
+\[
+\frac{d\epsilon}{dt} \approx \Lambda\,\delta^*\frac{\partial X}{\partial\delta}\,\epsilon = \sigma_a\,\epsilon .
+\]
+If $X$ falls through $X^*$ as $\delta$ grows ($\sigma_a < 0$), a swing larger than $\delta^*$ sees $X < X^*$, $\lambda < 0$, and shrinks back, and a smaller one sees $\lambda > 0$ and grows back: the steady swing is stable, and the steeper the fall, the faster the return. If instead $X$ rose through $X^*$, an excess swing would find more drive and run away and a deficit would collapse --- that crossing would be a threshold, not a steady state. So the sign of $\delta\,\partial X/\partial\delta$ at $\delta^*$ is the whole content of the amplitude stability, and ``the drive falls with amplitude'' is the stable case. It is the same self-limitation that section 6.3 names as the origin of the limit cycle; (38) says which parts of the cycle produce it.
+
+\subsection*{10.5 The mass balance at any amplitude}
+
+Differentiating the mean-flow integrals of (16) with respect to $\bar P$ gives $\partial\dot m_{0,out}/\partial\bar P = \langle\dot m'_{out}\rangle$ and $\partial\dot m_{0,in}/\partial\bar P = -\langle\dot m'_{in}\rangle$, so
+\begin{equation}
+\frac{\partial\left(\dot m_{0,in} - \dot m_{0,out}\right)}{\partial\bar P} = \frac{c_1\dot m_{max}}{2\Delta P_{max}}\,X_0(\bar P,\delta), \qquad
+X_0 \equiv \left\langle\tilde h\big(u_{in}(\psi)\big) + \tilde h\big(u_{out}(\psi)\big)\right\rangle , \tag{39}
+\end{equation}
+which is (29) at any amplitude. At $\delta = 0$, $X_0 = X > X^* > 0$ inside the window: by (31) the balance pressure $P_b$, where $\dot m_{net} = 0$, is unstable and the mean runs away from it. At the steady swing $X_0 < 0$ (section 10.7): the oscillation turns the balance into a stable point, by the same shut and reversed parts of the cycle that limit its amplitude.
+
+\subsection*{10.6 The fixed point and its three rates}
+
+For identical reeds the mass balance has a symmetry. At $\bar P = P_b = (P_{in} + P_{out})/2$ the two reeds see the same mean drop $\Delta\bar P = (P_{in} - P_{out})/2$ and mirror-image swings, $\Delta\bar P \mp \delta\cos\psi$, so $\dot m_{0,in} = \dot m_{0,out}$ at $P_b$ for every $\delta$. With a pure-cosine waveform the steady mean is therefore $\bar P^* = P_b$ exactly, whatever the swing, and $\partial(\dot m_{0,in} - \dot m_{0,out})/\partial\delta = 0$ there.
+
+Writing $F_M = \dot m_{0,in} - \dot m_{0,out}$ and $F_P$ for the right side of (26), and using $\lambda^* = 0$, the Jacobian of the slow system at the fixed point is
+\begin{equation}
+J = \begin{pmatrix} 0 & \partial F_M/\partial\bar P & 0 \\[2pt] \partial F_P/\partial\bar M & \partial F_P/\partial\bar P & \partial F_P/\partial a \\[2pt] a^*\partial\lambda/\partial\bar M & a^*\partial\lambda/\partial\bar P & a^*\partial\lambda/\partial a \end{pmatrix} , \tag{40}
+\end{equation}
+the first entry being zero because the mass equation contains no temperature. Three entries have closed forms.
+
+\emph{Amplitude.} Since $\lambda^* = 0$, $a^*\partial\lambda/\partial a = \delta^*\partial\lambda/\partial\delta$, and by (37) and (38)
+\begin{equation}
+\sigma_a \equiv \delta^*\frac{\partial\lambda}{\partial\delta} = \Lambda\,\delta\frac{\partial X}{\partial\delta} = 2\Lambda\left\langle\left[\tilde h(u_{in}) + \tilde h(u_{out})\right]\cos 2\psi\right\rangle . \tag{41}
+\end{equation}
+
+\emph{Mean pressure.} The flux term of (26) is $\gamma RT_{in}F_M$ to leading order, so with the drift coefficient $C$ of (31), $\kappa = fc^2C/2\bar V_{cv}$ of (32) and (39),
+\begin{equation}
+\sigma_P \equiv \frac{\partial F_P}{\partial\bar P} \approx \frac{1}{C}\,\frac{\partial F_M}{\partial\bar P} = \frac{\Lambda}{\kappa}\,X_0(\bar P^*,\delta^*) , \tag{42}
+\end{equation}
+the drift rate of (31) with the mass-balance slope at the steady swing; the remainder of $\partial F_P/\partial\bar P$ is the $\bar P$-dependence of the $\delta^2$ term.
+
+\emph{Mean temperature.} Once the two fast modes have relaxed, $\bar P$ follows $\bar M$ quasi-statically through $F_P = 0$ and only the mass equation is left. $F_P$ depends on $\bar M$ only through $\bar T \propto 1/\bar M$ in the enthalpy flux, so $\partial F_P/\partial\bar M = \gamma R\bar T\dot m_{0,out}/\bar M(\bar V_{cv} + \bar V_{pass})$, while $\partial F_P/\partial\bar P \approx \gamma R\bar T\,(\partial F_M/\partial\bar P)/(\bar V_{cv} + \bar V_{pass})$. Hence $d\bar P_{qs}/d\bar M = -\dot m_{0,out}/(\bar M\,\partial F_M/\partial\bar P)$, and the slow mode decays at
+\begin{equation}
+\sigma_T = \frac{\partial F_M}{\partial\bar P}\,\frac{d\bar P_{qs}}{d\bar M} = -\frac{\dot m_{0,out}}{\bar M} , \tag{43}
+\end{equation}
+the rate at which the throughflow flushes the CV, whatever the reeds' slope.
+
+The steady oscillation is stable when the three eigenvalues of (40) are negative; with the decoupling of the symmetric point they are close to $\sigma_a$, $\sigma_P$ and $\sigma_T$. The conditions are $\delta\,\partial X/\partial\delta < 0$ (the gain falls with amplitude) and $X_0 < 0$ (the oscillation stabilizes the mean). Both hold at the steady swing because the extremes of the swing, where $\cos 2\psi = +1$, are spent on the shut and backflow branches.
+
+\subsection*{10.7 Baseline numbers}
+
+Baseline of the sweep notebooks, with the notebooks' constants; the numbers are those of \texttt{limit\_\allowbreak cycle\_\allowbreak stability.ipynb}. The fixed point of the slow equations is $\bar P^* = P_b = 5.725$ bar, $\delta^* = 0.2947$ bar, $\bar T^* = 299.05$ K; the simulation on its steady oscillation has $\delta = 0.2946$ bar and $\bar T = 298.9$ K, and a mean of $5.716$ bar (section 10.8). At the steady swing each reed is pressed shut for 29 percent of the cycle and reversed for 12 percent. The three averages:
+\begin{itemize}
+\item $X(\bar P^*, \delta^*) = 0.376 = X^*$, against $X(\bar P^*, 0) = 2.07$: the drive at the steady swing is a fifth of the small-signal drive, and it is what the piston damping eats.
+\item $\delta\,\partial X/\partial\delta = -5.9$, so $\sigma_a = \Lambda\,\delta\,\partial X/\partial\delta = -26.4$ s$^{-1}$ ($\Lambda = 4.43$ s$^{-1}$): an amplitude perturbation decays with a time constant of 38 ms, five cycles.
+\item $X_0 = -2.6$, against $+2.07$ without oscillation: $\sigma_P = (\Lambda/\kappa)X_0 = -11.7$ s$^{-1}$; the full entry $\partial F_P/\partial\bar P$ is $-11.6$ s$^{-1}$.
+\item $\sigma_T = -\dot m_{0,out}/\bar M = -0.204$ s$^{-1}$ (0.135 g/s through 0.663 g).
+\end{itemize}
+The eigenvalues of (40) by finite differences are $-26.4$, $-11.4$ and $-0.205$ s$^{-1}$, each with its own variable: the amplitude mode moves the mean by about 1 Pa per percent of amplitude, and the pressure mode carries 0.3 percent of amplitude per percent of mean pressure. So a change of the swing alone returns along the one-dimensional law $d\ln\delta/dt = \lambda(\bar P^*, \delta)$ with the mean frozen, and the mean does not take part.
+
+\emph{Without the backflow branch} (the one-sided law (6)): $\delta^* = 0.334$ bar (13 percent larger), $\delta\,\partial X/\partial\delta = -1.4$ and $\sigma_a = -6.1$ s$^{-1}$, $X_0 = -0.31$ and $\sigma_P = -1.4$ s$^{-1}$. The backflow is what pins the amplitude: it returns four times more slowly without it, and the mean eight times more slowly. Both averages have a sharp spike where the swing first reaches the reversal point, $\delta = \Delta\bar P$, because the slope (36) diverges as $1/\sqrt{\lvert u\rvert}$ there.
+
+\emph{The check.} In the full simulation the oscillating part of the state at 1.5 s is scaled by a factor $\eta$ between 0.5 and 3 (the piston's position and velocity about their cycle means, and the CV energy about its cycle mean, with the mass unchanged --- the sealed-cycle relations are linear, so this changes the swing and nothing else). The per-cycle swing afterwards agrees with $\delta(t)$ of the averaged model started from $\eta a^*$ to better than a millibar, and its rate of return, fitted while the deviation decays from a half to a twentieth of its initial value, is 25 to 28 s$^{-1}$ for $\eta$ between 0.5 and 1.5, against $\sigma_a = -26.4$ s$^{-1}$ (22 s$^{-1}$ for $\eta = 3$, where the return starts on the flatter part of $\lambda(\delta)$; the averaged model gives 21); with the one-sided law, 5.3 to 7.3 s$^{-1}$ against $-6.2$. The simulated mean moves by less than a millibar.
+
+\subsection*{10.8 Large perturbations: the edge of the basin}
+
+A large loss of amplitude is a different question. Once the swing is small the reeds no longer reach their shut and backflow branches, $X_0$ is positive again, and the mean is back on the unstable balance: it runs away from $P_b$ at $(\Lambda/\kappa)X_0(\bar P^*, 0) = 9$ s$^{-1}$ while the oscillation regrows at $\lambda_{lin} = 7$ s$^{-1}$. The outcome is the race of section 9, and the budget (33) applies with $P_0 = \bar P^*$: a sudden drop to $\delta_0$ is survived if
+\begin{equation}
+\ln\frac{\delta^*}{\delta_0} < B(P_0 = \bar P^*) . \tag{44}
+\end{equation}
+What decides $B$ is how far $\bar P^*$ sits from $P_b$, because $\dot m_{net}(P_0)$ in the logarithm of (33) vanishes there. With the pure cosine, $\bar P^* = P_b$ exactly (section 10.6), the mean has nowhere to run until the small temperature term of (26) nudges it, and the averaged model survives a drop to 0.9 percent of the steady swing (2.6 mbar). The simulated waveform has a second harmonic of 2.6 percent of the fundamental, in phase with it, which raises both the peaks and the troughs relative to the mean and breaks the symmetry of section 10.6: the rectified flows balance 9 mbar below $P_b$, at $5.716$ bar, which is where the simulated mean sits (this is the 8 mbar of section 8, and it is a waveform effect, not a temperature one). From there the resonator drains after a large loss, the inlet reed is pressed shut at $P_{in} - \Delta P_{max} = 5.542$ bar after $t_1 = 0.34$ s, and (33) gives $B = 2.3$ (2.9 from the logarithm, $-0.6$ from the damping): the oscillation survives a drop to $\delta^*e^{-B} = 29$ mbar, 10 percent of the steady swing. The full simulation survives a drop to 12 percent (35 mbar) and stalls at 11.5 percent; the averaged model started from the simulated mean and temperature gives 9 to 10 percent. Without the backflow branch the simulated mean sits 13 mbar below $P_b$ and the edge is at 15 percent.
+
+\subsection*{10.9 Summary}
+
+The steady oscillation is stable, in the averaged model and in the simulation. Three cycle averages of the local reed slope (36) govern it: with the weight $2\sin^2\psi$ the gain, (37); with the weight $\cos 2\psi$ its amplitude derivative, (38); with the weight 1 the slope of the mass balance, (39). At the steady swing the extremes of the cycle are spent on the shut and backflow branches, which makes the first equal to $X^*$ and the other two negative, and gives the three rates (41)--(43): $-26$ s$^{-1}$ for the amplitude, $-11$ s$^{-1}$ for the mean pressure, $-0.2$ s$^{-1}$ for the temperature. The backflow branch sets the amplitude's stiffness. A loss of more than about 90 percent of the swing is not survived, and the edge is the race of section 9 started from the steady mean, decided by the 9 mbar by which the second harmonic of the waveform displaces that mean from the balance pressure.
+
+\end{document}

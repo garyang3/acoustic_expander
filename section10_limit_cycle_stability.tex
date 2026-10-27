@@ -1,0 +1,124 @@
+% ---------------------------------------------------------------------------
+% Section 10 for Separation_of_scales.tex: stability of the steady oscillation.
+% Paste after section 9. Equation numbers continue from (34). Numbers from
+% limit_cycle_stability.ipynb.
+% ---------------------------------------------------------------------------
+\section*{10. Stability of the steady oscillation}
+
+\subsection*{10.1 The question}
+
+Suppose the resonator has settled on its steady oscillation and the swing is suddenly made smaller or larger, with the mean pressure, the mass in the CV and the mean piston position left alone. Does the swing return, how fast, and how large a loss does it survive?
+
+The steady oscillation is a fixed point $(\bar M^*, \bar P^*, a^*)$ of the three slow equations: the mass balance (23), $\dot m_{0,in} = \dot m_{0,out}$, fixes $\bar P^*$; the condition $\lambda = 0$ of (20), that is $g^* = b/mf$, fixes $\delta^* = k_{cv}a^*/A$; and $d\bar P/dt = 0$ in (26) fixes $\bar T^*$ and with it $\bar M^*$. Its stability is the stability of this fixed point: linearize the slow system and look at three eigenvalues. Two of them have closed forms, obtained by integrating the Fourier integrals (16) by parts; the third is the flushing rate of the CV.
+
+Three things are carried along that the journal leaves out, all used in the numbers below: the outlet enthalpy flux at the adiabatic temperature $T(\psi)$ (section 5.3); the energy-consistent acoustic-power term, (26) with its $\delta^2$ term multiplied by $1 - 1/\gamma$ (the remark at the end of section 7 of the adiabatic note); and the backflow branch of the reed law, which the simulation has always had. The last matters here because the steady swing is large enough for both reeds to reverse during part of every cycle.
+
+\subsection*{10.2 The reed law with backflow, and its local slope}
+
+The reed law of the simulation notebooks is (6) with a reverse branch,
+\begin{equation}
+\dot m(\Delta P) = \begin{cases} c_1\dot m_{max}(1-u)\sqrt u, & 0 < u < 1, \\[2pt] -c_1\dot m_{max}(1-u)\sqrt{\lvert u\rvert}, & u \le 0 \ \text{(backflow)}, \\[2pt] 0, & u \ge 1 \ \text{(pressed shut)}, \end{cases} \qquad u = \frac{\Delta P}{\Delta P_{max}} . \tag{35}
+\end{equation}
+Its slope is the same expression on both open branches,
+\begin{equation}
+\dot m'(\Delta P) = -\frac{c_1\dot m_{max}}{2\Delta P_{max}}\,\tilde h(u), \qquad
+\tilde h(u) = \begin{cases} \dfrac{3u-1}{\sqrt{\lvert u\rvert}}, & u < 1, \\[6pt] 0, & u \ge 1 , \end{cases} \tag{36}
+\end{equation}
+where $\tilde h$ is the drive function $h(u)$ of (32a) continued to the backflow branch. There it is negative: a reversed reed is a leak whose flow rises with the pressure drop, a positive conductance, which damps. $\tilde h > 0$ only on the falling branch $\tfrac13 < u < 1$. Along a cycle the reeds see
+\[
+u_{in}(\psi) = \frac{P_{in} - \bar P - \delta\cos\psi}{\Delta P_{max}}, \qquad u_{out}(\psi) = \frac{\bar P - P_{out} + \delta\cos\psi}{\Delta P_{max}},
+\]
+and $\langle\cdot\rangle \equiv \frac{1}{2\pi}\int_0^{2\pi}(\cdot)\,d\psi$ denotes the cycle average.
+
+\subsection*{10.3 The gain at any amplitude}
+
+Integrate the first-harmonic integral of (16) by parts. $\dot m$ is continuous across $u = 0$ and $u = 1$, so there are no boundary terms and no jumps to collect:
+\[
+\dot m_{1,out} = \frac{1}{\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)\cos\psi\,d\psi
+= \frac{\delta}{\pi}\int_0^{2\pi}\dot m'\left(\Delta\bar P_{out} + \delta\cos\psi\right)\sin^2\psi\,d\psi ,
+\]
+and the inlet, whose drop is $\Delta\bar P_{in} - \delta\cos\psi$, gives the same with the opposite sign. Hence $N_{out} = 2\langle\dot m'_{out}\sin^2\psi\rangle$, $N_{in} = -2\langle\dot m'_{in}\sin^2\psi\rangle$, and with (36) and $\bar T = T_{in}$ the gain (17) and the growth rate (20) read
+\begin{equation}
+\lambda(\bar P,\delta) = \Lambda\left[X(\bar P,\delta) - X^*\right], \qquad
+X(\bar P,\delta) \equiv 2\left\langle\left[\tilde h\big(u_{in}(\psi)\big) + \tilde h\big(u_{out}(\psi)\big)\right]\sin^2\psi\right\rangle , \tag{37}
+\end{equation}
+with $\Lambda$ and $X^*$ of (32b). This is (32a) at any amplitude: since $2\langle\sin^2\psi\rangle = 1$, $X(\bar P, 0) = h(u_{in}) + h(u_{out})$. The gain is the drive $\tilde h$ averaged over the cycle with the weight $2\sin^2\psi$, which is 2 at mid-swing and 0 at the extremes. The steady swing is where $X(\bar P^*, \delta^*) = X^*$.
+
+With the adiabatic outlet temperature, $\dot m'_{out}$ in these averages is replaced by the slope of the enthalpy flux,
+\[
+\frac{1}{\bar T}\,\frac{d(\dot m_{out}T)}{d\Delta P_{out}} = \frac{T(\psi)}{\bar T}\left[\dot m'_{out} + \varepsilon\,\frac{\dot m_{out}}{P(\psi)}\right],
+\]
+which is the second term of (32b$'$) spread over the cycle; the numbers below include it (about a percent).
+
+\subsection*{10.4 The amplitude derivative of the gain}
+
+Differentiate (16) under the integral sign: $d\dot m_{1,out}/d\delta = \frac{1}{\pi}\int\dot m'_{out}\cos^2\psi\,d\psi$. Subtract $N_{out} = \dot m_{1,out}/\delta$ and use $\cos^2\psi - \sin^2\psi = \cos 2\psi$; the inlet again with the opposite sign. So
+\begin{equation}
+\delta\,\frac{\partial X}{\partial\delta} = 2\left\langle\left[\tilde h\big(u_{in}(\psi)\big) + \tilde h\big(u_{out}(\psi)\big)\right]\cos 2\psi\right\rangle . \tag{38}
+\end{equation}
+The weight $\cos 2\psi$ is $+1$ at both extremes of the swing and $-1$ at mid-swing. The gain falls with amplitude exactly when the reeds drive less at the extremes than at mid-swing --- which is what being pressed shut ($\tilde h = 0$) or reversed ($\tilde h < 0$) at the extremes does. At small amplitude the average vanishes and the gain is amplitude-independent, as it must be.
+
+\subsection*{10.5 The mass balance at any amplitude}
+
+Differentiating the mean-flow integrals of (16) with respect to $\bar P$ gives $\partial\dot m_{0,out}/\partial\bar P = \langle\dot m'_{out}\rangle$ and $\partial\dot m_{0,in}/\partial\bar P = -\langle\dot m'_{in}\rangle$, so
+\begin{equation}
+\frac{\partial\left(\dot m_{0,in} - \dot m_{0,out}\right)}{\partial\bar P} = \frac{c_1\dot m_{max}}{2\Delta P_{max}}\,X_0(\bar P,\delta), \qquad
+X_0 \equiv \left\langle\tilde h\big(u_{in}(\psi)\big) + \tilde h\big(u_{out}(\psi)\big)\right\rangle , \tag{39}
+\end{equation}
+which is (29) at any amplitude. At $\delta = 0$, $X_0 = X > X^* > 0$ inside the window: the balance pressure $P_b$, where $\dot m_{net} = 0$, is unstable and the mean runs away from it (section 9.4). At the steady swing $X_0 < 0$ (section 10.7): the oscillation turns the balance into a stable point, by the same shut and reversed parts of the cycle that limit its amplitude.
+
+\subsection*{10.6 The fixed point and its three rates}
+
+For identical reeds the mass balance has a symmetry. At $\bar P = P_b = (P_{in} + P_{out})/2$ the two reeds see the same mean drop $\Delta\bar P = (P_{in} - P_{out})/2$ and mirror-image swings, $\Delta\bar P \mp \delta\cos\psi$, so $\dot m_{0,in} = \dot m_{0,out}$ at $P_b$ for every $\delta$. With a pure-cosine waveform the steady mean is therefore $\bar P^* = P_b$ exactly, whatever the swing, and $\partial(\dot m_{0,in} - \dot m_{0,out})/\partial\delta = 0$ there.
+
+Writing $F_M = \dot m_{0,in} - \dot m_{0,out}$ and $F_P$ for the right side of (26), and using $\lambda^* = 0$, the Jacobian of the slow system at the fixed point is
+\begin{equation}
+J = \begin{pmatrix} 0 & \partial F_M/\partial\bar P & 0 \\[2pt] \partial F_P/\partial\bar M & \partial F_P/\partial\bar P & \partial F_P/\partial a \\[2pt] a^*\partial\lambda/\partial\bar M & a^*\partial\lambda/\partial\bar P & a^*\partial\lambda/\partial a \end{pmatrix} , \tag{40}
+\end{equation}
+the first entry being zero because the mass equation contains no temperature. Three entries have closed forms.
+
+\emph{Amplitude.} Since $\lambda^* = 0$, $a^*\partial\lambda/\partial a = \delta^*\partial\lambda/\partial\delta$, and by (37) and (38)
+\begin{equation}
+\sigma_a \equiv \delta^*\frac{\partial\lambda}{\partial\delta} = \Lambda\,\delta\frac{\partial X}{\partial\delta} = 2\Lambda\left\langle\left[\tilde h(u_{in}) + \tilde h(u_{out})\right]\cos 2\psi\right\rangle . \tag{41}
+\end{equation}
+
+\emph{Mean pressure.} The flux term of (26) is $\gamma RT_{in}F_M$ to leading order, so with the drift coefficient $C$ of (31), $\kappa = fc^2C/2\bar V_{cv}$ of (32) and (39),
+\begin{equation}
+\sigma_P \equiv \frac{\partial F_P}{\partial\bar P} \approx \frac{1}{C}\,\frac{\partial F_M}{\partial\bar P} = \frac{\Lambda}{\kappa}\,X_0(\bar P^*,\delta^*) , \tag{42}
+\end{equation}
+the runaway rate of section 9.4 evaluated with the mass-balance slope at the steady swing; the remainder of $\partial F_P/\partial\bar P$ is the $\bar P$-dependence of the $\delta^2$ term.
+
+\emph{Mean temperature.} Once the two fast modes have relaxed, $\bar P$ follows $\bar M$ quasi-statically through $F_P = 0$ and only the mass equation is left. $F_P$ depends on $\bar M$ only through $\bar T \propto 1/\bar M$ in the enthalpy flux, so $\partial F_P/\partial\bar M = \gamma R\bar T\dot m_{0,out}/\bar M(\bar V_{cv} + \bar V_{pass})$, while $\partial F_P/\partial\bar P \approx \gamma R\bar T\,(\partial F_M/\partial\bar P)/(\bar V_{cv} + \bar V_{pass})$. Hence $d\bar P_{qs}/d\bar M = -\dot m_{0,out}/(\bar M\,\partial F_M/\partial\bar P)$, and the slow mode decays at
+\begin{equation}
+\sigma_T = \frac{\partial F_M}{\partial\bar P}\,\frac{d\bar P_{qs}}{d\bar M} = -\frac{\dot m_{0,out}}{\bar M} , \tag{43}
+\end{equation}
+the rate at which the throughflow flushes the CV, whatever the reeds' slope.
+
+The steady oscillation is stable when the three eigenvalues of (40) are negative; with the decoupling of the symmetric point they are close to $\sigma_a$, $\sigma_P$ and $\sigma_T$. The conditions are $\delta\,\partial X/\partial\delta < 0$ (the gain falls with amplitude) and $X_0 < 0$ (the oscillation stabilizes the mean). Both hold at the steady swing because the extremes of the swing, where $\cos 2\psi = +1$, are spent on the shut and backflow branches.
+
+\subsection*{10.7 Baseline numbers}
+
+Baseline of the sweep notebooks, with the notebooks' constants; the numbers are those of \texttt{limit\_\allowbreak cycle\_\allowbreak stability.ipynb}. The fixed point of the slow equations is $\bar P^* = P_b = 5.725$ bar, $\delta^* = 0.2947$ bar, $\bar T^* = 299.05$ K; the simulation on its steady oscillation has $\delta = 0.2946$ bar and $\bar T = 298.9$ K, and a mean of $5.716$ bar (section 10.8). At the steady swing each reed is pressed shut for 29 percent of the cycle and reversed for 12 percent. The three averages:
+\begin{itemize}
+\item $X(\bar P^*, \delta^*) = 0.376 = X^*$, against $X(\bar P^*, 0) = 2.07$: the drive at the steady swing is a fifth of the small-signal drive, and it is what the piston damping eats.
+\item $\delta\,\partial X/\partial\delta = -5.9$, so $\sigma_a = \Lambda\,\delta\,\partial X/\partial\delta = -26.4$ s$^{-1}$ ($\Lambda = 4.43$ s$^{-1}$): an amplitude perturbation decays with a time constant of 38 ms, five cycles.
+\item $X_0 = -2.6$, against $+2.07$ without oscillation: $\sigma_P = (\Lambda/\kappa)X_0 = -11.7$ s$^{-1}$; the full entry $\partial F_P/\partial\bar P$ is $-11.6$ s$^{-1}$.
+\item $\sigma_T = -\dot m_{0,out}/\bar M = -0.204$ s$^{-1}$ (0.135 g/s through 0.663 g).
+\end{itemize}
+The eigenvalues of (40) by finite differences are $-26.4$, $-11.4$ and $-0.205$ s$^{-1}$, each with its own variable: the amplitude mode moves the mean by about 1 Pa per percent of amplitude, and the pressure mode carries 0.3 percent of amplitude per percent of mean pressure. So a change of the swing alone returns along the one-dimensional law $d\ln\delta/dt = \lambda(\bar P^*, \delta)$ with the mean frozen, and the mean does not take part.
+
+\emph{Without the backflow branch} (the one-sided law (6)): $\delta^* = 0.334$ bar (13 percent larger), $\delta\,\partial X/\partial\delta = -1.4$ and $\sigma_a = -6.1$ s$^{-1}$, $X_0 = -0.31$ and $\sigma_P = -1.4$ s$^{-1}$. The backflow is what pins the amplitude: it returns four times more slowly without it, and the mean eight times more slowly. Both averages have a sharp spike where the swing first reaches the reversal point, $\delta = \Delta\bar P$, because the slope (36) diverges as $1/\sqrt{\lvert u\rvert}$ there.
+
+\emph{The check.} In the full simulation the oscillating part of the state at 1.5 s is scaled by a factor $\eta$ between 0.5 and 3 (the piston's position and velocity about their cycle means, and the CV energy about its cycle mean, with the mass unchanged --- the sealed-cycle relations are linear, so this changes the swing and nothing else). The per-cycle swing afterwards agrees with $\delta(t)$ of the averaged model started from $\eta a^*$ to better than a millibar, and its rate of return, fitted while the deviation decays from a half to a twentieth of its initial value, is 25 to 28 s$^{-1}$ for $\eta$ between 0.5 and 1.5, against $\sigma_a = -26.4$ s$^{-1}$ (22 s$^{-1}$ for $\eta = 3$, where the return starts on the flatter part of $\lambda(\delta)$; the averaged model gives 21); with the one-sided law, 5.3 to 7.3 s$^{-1}$ against $-6.2$. The simulated mean moves by less than a millibar.
+
+\subsection*{10.8 Large perturbations: the edge of the basin}
+
+A large loss of amplitude is a different question. Once the swing is small the reeds no longer reach their shut and backflow branches, $X_0$ is positive again, and the mean is back on the unstable balance of section 9.4: it runs away from $P_b$ at $(\Lambda/\kappa)X_0(\bar P^*, 0) = 9$ s$^{-1}$ while the oscillation regrows at $\lambda_{lin} = 7$ s$^{-1}$. The outcome is the race of section 9, and the budget (33) applies with $P_0 = \bar P^*$: a sudden drop to $\delta_0$ is survived if
+\begin{equation}
+\ln\frac{\delta^*}{\delta_0} < B(P_0 = \bar P^*) . \tag{44}
+\end{equation}
+What decides $B$ is how far $\bar P^*$ sits from $P_b$, because $\dot m_{net}(P_0)$ in the logarithm of (33) vanishes there. With the pure cosine, $\bar P^* = P_b$ exactly (section 10.6), the mean has nowhere to run until the small temperature term of (26) nudges it, and the averaged model survives a drop to 0.9 percent of the steady swing (2.6 mbar). The simulated waveform has a second harmonic of 2.6 percent of the fundamental, in phase with it, which raises both the peaks and the troughs relative to the mean and breaks the symmetry of section 10.6: the rectified flows balance 9 mbar below $P_b$, at $5.716$ bar, which is where the simulated mean sits (this is the ``8 mbar'' of section 8 and of the adiabatic note, and it is a waveform effect, not a temperature one). From there the resonator drains after a large loss, the inlet reed is pressed shut at $P_{in} - \Delta P_{max} = 5.542$ bar after $t_1 = 0.34$ s, and (33) gives $B = 2.3$ (2.9 from the logarithm, $-0.6$ from the damping): the oscillation survives a drop to $\delta^*e^{-B} = 29$ mbar, 10 percent of the steady swing. The full simulation survives a drop to 12 percent (35 mbar) and stalls at 11.5 percent; the averaged model started from the simulated mean and temperature gives 9 to 10 percent. Without the backflow branch the simulated mean sits 13 mbar below $P_b$ and the edge is at 15 percent.
+
+\subsection*{10.9 Summary}
+
+The steady oscillation is stable, in the averaged model and in the simulation. Three cycle averages of the local reed slope (36) govern it: with the weight $2\sin^2\psi$ the gain, (37); with the weight $\cos 2\psi$ its amplitude derivative, (38); with the weight 1 the slope of the mass balance, (39). At the steady swing the extremes of the cycle are spent on the shut and backflow branches, which makes the first equal to $X^*$ and the other two negative, and gives the three rates (41)--(43): $-26$ s$^{-1}$ for the amplitude, $-11$ s$^{-1}$ for the mean pressure, $-0.2$ s$^{-1}$ for the temperature. The backflow branch sets the amplitude's stiffness. A loss of more than about 90 percent of the swing is not survived, and the edge is the race of section 9 started from the steady mean, decided by the 9 mbar by which the second harmonic of the waveform displaces that mean from the balance pressure.

@@ -1,0 +1,32 @@
+% ---------------------------------------------------------------------------
+% Section 5.3 for Separation_of_scales.tex: the temperature the outflow carries.
+% Place after section 5.2. Equation tags (17a)-(17d) follow (17).
+% ---------------------------------------------------------------------------
+\subsection*{5.3 The temperature the outflow carries}
+
+In (2) the outflow carries the instantaneous CV temperature. Over a cycle the gas is compressed and expanded adiabatically (section 4), so at the phase $\psi$
+\begin{equation}
+T(\psi) = \bar T\left(\frac{P(\psi)}{\bar P}\right)^{\varepsilon}, \qquad P(\psi) = \bar P + \delta\cos\psi, \qquad \varepsilon = \frac{\gamma-1}{\gamma} . \tag{17a}
+\end{equation}
+Sections 5.1, 5.2 and 7.2 replaced it by $\bar T$. Because the outlet reed sits on its falling branch, it passes the most gas when the CV pressure is low, so the gas it lets out is cooler than $\bar T$: by 0.8 K on the steady oscillation of the baseline, by up to 2 K while an oscillation grows. Keeping (17a), the outlet's mass flow is unchanged and its enthalpy flux is weighted by the temperature at each phase:
+\begin{equation}
+\begin{aligned}
+H_{0,out} &= \frac{1}{2\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)T(\psi)\,d\psi, \\
+H_{1,out} &= \frac{1}{\pi}\int_0^{2\pi}\dot m\left(\Delta\bar P_{out} + \delta\cos\psi\right)T(\psi)\cos\psi\,d\psi .
+\end{aligned} \tag{17b}
+\end{equation}
+The outlet terms of (17) and (26) become
+\begin{equation}
+g(\bar P,\delta) = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}N_{in} - \frac{H_{1,out}}{\delta}\right), \qquad
+T_{in}\dot m_{0,in} - \bar T\dot m_{0,out} \;\to\; T_{in}\dot m_{0,in} - H_{0,out} . \tag{17c}
+\end{equation}
+To first order in $\delta/\bar P$,
+\begin{equation}
+\frac{H_{1,out}}{\delta} = \bar T\left(N_{out} + \frac{\varepsilon}{\bar P}\dot m_{0,out}\right), \qquad
+H_{0,out} = \bar T\left(\dot m_{0,out} + \frac{\varepsilon\delta^2}{2\bar P}N_{out}\right) . \tag{17d}
+\end{equation}
+The correction to $g$ is the bracketed term $\gamma R\bar{\dot m}_{out}T'/\bar V$ of section 5.1: it lowers $g$ by $\gamma\varepsilon\dot m_{0,out}/\bar M$ (0.16\,s$^{-1}$ in the baseline, under one percent). The correction to the flux is a $\delta^2$ term of the same kind as the acoustic-power term (24). A one-point alternative evaluates (17a) where the outlet flow peaks, $P^* = P_{out} + \Delta P_{max}/3$, and replaces $\bar T$ by $T_{out} = \bar T(P^*/\bar P)^{\varepsilon}$ in both outlet terms. It does not depend on $\delta$, so it cools the outflow even when the swing never reaches $P^*$.
+
+In section 9 the identity (28) needs the same temperature on both valves. With (17d) the drift (31) is unchanged at $\delta = 0$ and $\lambda_{lin}$ is lowered by $\tfrac{f}{2}\gamma\varepsilon\dot m_{0,out}/\bar M$. With $T_{out}$, $\dot m_{net}$ is replaced by $\dot m_{in} - \theta\dot m_{out}$, $\theta = T_{out}/T_{in} \approx 0.993$, which moves the balance pressure down by 0.8 mbar. The budget $B$ drops by 0.01 and 0.04 e-folds respectively, and none of the budget verdicts change.
+
+Against the full simulation (\texttt{outlet\_temperature\_check.ipynb}, the 37 sweep settings), (17a) reproduces the temperature of the leaving gas to within 0.05 K during growth and stall and 0.3 K on the steady oscillation; $\bar T$ is 1 to 2 K too warm and $T_{out}$ 1 to 4 K too cold. The steady mean pressure and amplitude do not change: the mean is fixed by the mass balance (23), which contains no temperature. The stall runs do change. Both alternatives reduce their envelope errors, fix the one outcome $\bar T$ gets wrong (a 2.5 m/s kick), and move the averaged model's kick threshold from 2.48 m/s toward the simulation's 2.62 m/s: to 2.53 m/s with (17b), to 2.57 m/s with $T_{out}$. $T_{out}$ does better on pressure only because it overcools the outflow, which partly offsets an error of the averaged mean pressure during the filling that remains with (17b) and comes from the model's other approximations.

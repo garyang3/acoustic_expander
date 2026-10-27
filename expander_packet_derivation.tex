@@ -1,0 +1,388 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+
+\title{The wave-packet solution, derived --- essential path only}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+This is the middle-length version: every load-bearing step from the model (Adams 2024, Eqs. 3.34--3.42) to the packet solution $P_{cv} = \bar P + \delta\cos\phi$, shown in full --- and nothing that is not on that path. Cut relative to \texttt{expander\_two\_timescale\_notes.md} (the full notes): the enthalpy identity and its cycle average, entropy remarks, the cross-checks (energy method, admittance equivalence, exact-root comparison), the third root, dropped-term ledgers, and validation detail. When you want any of those, the full notes have them; section numbers there are cited in brackets.
+
+\section*{0. Strategy}
+
+The simulated signal is a fast oscillation whose amplitude and mean drift slowly --- a wave packet. The plan, in four moves. \textbf{(i)} Split every variable into a cycle mean plus a fast oscillating, first harmonic with slowly varying amplitude. \textbf{(ii)} On the fast timescale the valves barely act, so one cycle is a sealed gas oscillation --- that fixes the fact frequency $\omega(\bar P)$, its slowly varying height is the envelope --- here the raw 100 to 130 Hz wiggle versus the slow growth and collapse of its amplitude). \textbf{(iii)} The small once-per-cycle valve response, projected onto the first harmonic, acts as gain or loss on the oscillation --- that fixes the envelope rate $\lambda$. \textbf{(iv)} The cycle average of the equations fixes the drift of the mean $\bar P$. The output is three slow ODEs; the packet is rebuilt from their solution.
+
+\section*{1. The model}
+
+CV with inlet/outlet reed valves; gas piston (mass $m$, face area $A$, damping $b$) between the CV and a sealed passive gas volume. I summarize the equations in this section. 
+
+\begin{equation}
+\frac{dM}{dt} = \dot{m}_{in} - \dot{m}_{out} \tag{1}
+\end{equation}
+
+This is the mass conservation relationship. $M$ is the mass of the control volume. 
+
+\begin{equation}
+\frac{dE}{dt} = -P\frac{dV}{dt} + \dot{m}_{in}c_pT_{in} - \dot{m}_{out}c_pT \tag{2}
+\end{equation}
+
+This is the change in energy, due to work done by the control volume and enthalpy flows. $P$ is the pressure in the control volume. $T_{in}$ is the inlet pressure, which can be taken to ambient. $T$ is the temperature of control volume.  $V$ is the volume of the control volume. 
+
+\begin{equation}
+E = c_vMT, \qquad PV = MRT \tag{3}
+\end{equation}
+
+These two are thermodynamic relationships. Of course, we assume ideal gas. 
+
+$m_{slug}$ is the mass of a slug, with fixed mass and volume, sitting in between the control and passive volume. It oscillates back and forth in the resonator, and follows Newton's laws. The position of the slug is $x$. $b$ is the damping parameter, assumed to be fixed during oscillations. $V_{0c}$ is the equilibrium volume of the control volume. 
+
+\begin{equation}
+m_{slug}\ddot x + b\dot x = (P - P_{pass})A, \qquad V = V_{0c} + Ax \tag{4}
+\end{equation}
+
+\begin{equation}
+P_{pass}(x) = P_{p0}\left(\frac{V_{0p}}{V_{0p} - Ax}\right)^{\gamma} \tag{5}
+\end{equation}
+
+\begin{equation}
+\dot{m}(\Delta P) = c_1\dot m_{max}(1-u)\sqrt{u} \quad \text{for } 0 < u < 1, \quad \text{else } 0; \qquad u = \frac{\Delta P}{\Delta P_{max}}, \quad c_1 = \frac{3\sqrt 3}{2} \tag{6}
+\end{equation}
+
+with $ \dot{m}_{in} =  \dot{m}(P_{in}-P)$, $ \dot{m}_{out} =  \dot{m}(P-P_{out})$, plenum conditions $P_{in}, T_{in}, P_{out}$ fixed, and $R = c_p - c_v$, $\gamma = c_p/c_v$.
+
+\section*{2. The model as one pressure equation}
+
+From (3), we rearrange to get 
+\[
+MT = PV/R
+\]
+ and hence
+
+\[
+E = \frac{c_v}{R}PV
+\]
+
+ Differentiate with respect to time and insert into (2), we get:
+
+\[
+\frac{c_v}{R}\dot PV + \frac{c_v}{R}P\dot V = -P\dot V + c_p(F_{in}T_{in} - F_{out}T)
+\]
+
+Collect the $P\dot V$ terms using $1 + c_v/R = c_p/R$, then multiply by $R/(c_vV)$ using $(R/c_v)c_p = \gamma R$:
+
+\begin{equation}
+\frac{dP}{dt} = \frac{\gamma R}{V}\left(F_{in}T_{in} - F_{out}T\right) - \gamma\frac{P}{V}\frac{dV}{dt} \tag{7}
+\end{equation}
+
+This is the whole thermodynamics of the CV in one line: enthalpy fluxes in, boundary work out. 
+
+We can also derive a useful property. When the flow of enthalpy is small and negligible, we can assume isentropic expansion
+
+ 
+\begin{equation}
+\dot P/P = -\gamma\dot V/V \tag{8}
+\end{equation}
+, i.e. 
+
+\[
+PV^{\gamma} = \mathrm{const}
+\]
+
+\section*{3. The split}
+
+Write every variable as slow cycle mean ($\bar P(t)$) plus first harmonic $(P'(t))$ with slowly varying complex amplitude $\hat p(t)$: 
+
+\begin{equation}
+P(t) = \bar P(t) + P'(t), \qquad P' = \mathrm{Re}\left[\hat p(t)e^{i\phi(t)}\right], \qquad \dot\phi = \omega(\bar P), \qquad \delta = \lvert\hat p\rvert \tag{9}
+\end{equation}
+
+and the same for $T, M, x, V$ ($a = \lvert\hat x\rvert$). The split is meaningful because, as we see from simulations, there are two different time scales: the fast oscillation of the resonator (100Hz and higher) and the slow, filling or discharging of the entire chamber (1 - 10 Hz)
+
+\section*{4. Analyzing one cycle: approximation is that the system is sealed.}
+
+To leading order the fast motion obeys the isentropic relation (8), because the mass in flow from the valves during one cycle is assumed to be a lot smaller than the total mass $M$. Linearize it about the cycle mean --- expand $(\bar P + P')(\bar V + V')^\gamma$ to first order --- and use $V' = Ax'$:
+
+\begin{equation}
+\frac{P'}{\bar P} + \gamma\frac{V'}{\bar V} = 0 \qquad\Longrightarrow\qquad P' = -\frac{k_{cv}}{A}x', \qquad k_{cv} = \frac{\gamma\bar PA^2}{\bar V_{cv}} \tag{10}
+\end{equation}
+
+The CV pushes back on the piston like a spring of constant $k_{cv}$ (force $= AP' = -k_{cv}x'$). Now name the amplitudes: just as $\delta = \lvert\hat p\rvert$ is the pressure amplitude, $a = \lvert\hat x\rvert$ is the amplitude of the piston's displacement oscillation, in meters. Taking magnitudes of (10) converts one into the other:
+
+\begin{equation}
+\delta = \frac{k_{cv}a}{A} \tag{11}
+\end{equation}
+
+We utilize the mass-spring system analogy to help us derive the equation of motion later in the section. 
+
+Linearizing the passive adiabat (5) the same way gives the second spring, $k_{pass} = \gamma\bar P_{pass}A^2/\bar V_{pass}$. The piston between two gas springs oscillates at
+
+\begin{equation}
+\omega(\bar P) = \sqrt{\frac{k_{cv}+k_{pass}}{m}} = A\sqrt{\frac{\gamma\bar P}{m}\left(\frac{1}{\bar V_{cv}} + \frac{1}{\bar V_{pass}}\right)} \tag{12}
+\end{equation}
+
+(second form uses $\bar P_{pass} = \bar P$, from the quasi-static piston of section 7). 
+
+\section*{5. The valve feedback}
+
+\subsection*{5.1 Small amplitude: the tangent slope}
+
+We define $\Delta\bar P_{in} = P_{in} - \bar P$ and $\Delta\bar P_{out} = \bar P - P_{out}$. This describes how far is the average pressure oscillation from the inlet and outet pressure, respectively. 
+
+\begin{equation}
+\dot{m}_{in} \approx \bar {\dot{m}}_{in} + \frac{d\dot{m}_{in}}{dP'}P', \qquad \dot{m}_{out} \approx \bar {\dot{m}}_{out} + \frac{d\dot{m}_{out}}{dP'}P' \tag{13}
+\end{equation}
+
+Now substitute everything into (7): $P = \bar P + P'$, $T = \bar T + T'$, $V = \bar V_{cv} + Ax'$, $\dot V = d\bar V_{cv}/dt + A\dot x'$, the flows (13), and the prefactor $1/V = (1/\bar V_{cv})(1 - Ax'/\bar V_{cv} + \dots)$. Multiplying out to first order in the fluctuations, every term on the right hand side of equation 7 can be divided out to be 3 types, interms of oscillation speed. Purely slow, no oscillating factor:
+
+\[
+\frac{\gamma R}{\bar V_{cv}}\left(T_{in}\bar {\dot{m}}_{in} - \bar T\bar {\dot{m}}_{out}\right) - \frac{\gamma\bar P}{\bar V_{cv}}\frac{d\bar V_{cv}}{dt}
+\]
+
+Oscillating, linear in one fluctuation:
+
+\[
+-\frac{\gamma\bar PA}{\bar V_{cv}}\dot x' - \frac{\gamma R}{\bar V_{cv}}\left(T_{in}\frac{d\dot{m}_{in}}{dP'} + \bar T\frac{d\dot{m}_{out}}{dP'}\right)P' + [\frac{\gamma R}{\bar{V}} \bar{F}_{\text {out }} T^{\prime}-\frac{\gamma R}{\bar{V}^2} \bar{S} V^{\prime}-\gamma \frac{\dot{\bar{V}}}{\bar{V}} P^{\prime}]
+\]
+
+We can either numerically check the terms in the bracket and find that they are small compared to the terms NOT in the bracket. Another way to illustrate why we only keep the terms not in the bracket is that, we have to account for the "external drives", in this calse the block and the valves. The rest of the terms are the resonator's own feedback on the system. 
+
+Quadratic in two fluctuations, for example $\gamma AP'\dot x'/\bar V_{cv}$: a product of two first harmonics contains only a constant part and a second harmonic, according to trignometric properties, nothing resonating with the fast frequency, so it contributes nothing here --- its constant part is saved for section 7. The left side splits the same way, $dP/dt = d\bar P/dt + dP'/dt$.
+
+If we isolate the slow part, we would get
+
+\[
+\frac{d\bar P}{dt} = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}\bar F_{in} - \bar T\bar F_{out}\right) - \frac{\gamma\bar P}{\bar V_{cv}}\frac{d\bar V_{cv}}{dt} + \text{quadratic means}
+\]
+
+is set aside for section 7, which upgrades it in two ways that only make sense after 5.2: the bare $\bar F$ become the rectified $F_0$, and the quadratic means become the acoustic power. The oscillating balance is this section's result --- with $\gamma\bar PA/\bar V_{cv} = k_{cv}/A$ from (10),
+
+\begin{equation}
+\frac{dP'}{dt} = -\frac{k_{cv}}{A}\frac{dx'}{dt} + gP', \qquad g = -\frac{\gamma R}{\bar V_{cv}}\left(T_{in}F'_{in} + \bar TF'_{out}\right) \tag{14}
+\end{equation}
+
+The first term is the gas spring of (10); the second is new --- the valves feeding pressure fluctuation back on itself, at rate $g$. Its sign comes from the curve slope,
+
+\begin{equation}
+F'(\Delta P) = \frac{c_1\dot m_{max}}{\Delta P_{max}}\cdot\frac{1 - 3u}{2\sqrt u} \tag{15}
+\end{equation}
+
+negative on the falling branch $\frac13 < u < 1$ (valve pumps, $g > 0$), positive on the rising branch (valve damps), zero when closed.
+
+\subsection*{5.2 Finite amplitude: the first-harmonic gain}
+
+$F$ only depends on $\Delta P = \Delta \bar{P} + \delta \cos\psi$, where $\Delta P$ is the pressure of the control volume relative to the middle point of the valve curves. If we just focus on the fast part of the oscillation, then we can assume $ \Delta \bar{P}$ stays the same, and we can write $F$ as a function of $\psi$. Because $\Delta P$ is an even function of $\psi$
+
+Hence we can expand
+
+\[
+F(\psi)=F_{0}+F_{1} \cos \psi+F_{2} \cos 2 \psi+\ldots
+\]
+
+We can then find out that the $F_1$ term is proportional to pressure. $F_0$ is the constant term that contributes to the slow growing term. 
+
+To illustrate why only $F_1$ matters, we look at the equation. If we assume $\psi = \omega t$, then we can integrate with respect to time to get 
+
+\[
+\frac{d P}{d t}=\frac{\gamma R}{V}\left(T_{in} F_{in} - T_{out} F_{out}\right)
+\]
+
+\[
+P = \frac{\gamma R T_{in}}{V}(F_0 t + \frac{1}{\omega} F_1 \cos \omega t + \frac{1}{2\omega} F_2 \cos 2 \omega t + \ldots)_{in} -   \frac{\gamma R T_{out}}{V} (F_0 t + \frac{1}{\omega} F_1 \cos \omega t + \frac{1}{2\omega} F_2 \cos 2 \omega t + \ldots)_{out}
+\]
+
+4 things here: 1. the higher order cosine terms should already be small, because the valve flow follows the pressure. 2. Only the $F_1$ term follows the speed of the oscillation. Other terms contributes to higher harmonics that oscillates faster than the quantity that we care about. Therefore result in smaller driving effect for P. 3.  For any other meaningful calculation, the higher harmonics won't matter, because $\langle \cos\psi \cos 2\psi \rangle = 0$ 4. For expanding $cos(n\psi)$, you get term proportional to $\cos(x)^n$ and $\sin(x)^n$, which is higher order in $P$. 
+
+\begin{equation}
+F_0(\Delta\bar P, \delta) = \frac{1}{2\pi}\int_0^{2\pi}F(\Delta\bar P + \delta\cos\psi)d\psi, \qquad F_1 = \frac{1}{\pi\delta}\int_0^{2\pi}F(\Delta\bar P + \delta\cos\psi)\cos\psi~d\psi \tag{16}
+\end{equation}
+
+$N$ is the first-harmonic gain --- output at the oscillation frequency per unit input at the oscillation frequency --- which is precisely the role $F'$ played in (13). So (14) holds verbatim with
+
+\begin{equation}
+g(\bar P, \delta) = -\frac{\gamma R}{\bar V_{cv}}\left(T_{in}N_{in} + \bar TN_{out}\right) \tag{17}
+\end{equation}
+
+As $\delta \to 0$, Taylor expansion under the integrals gives $N \to F'$, so (17) contains section 5.1 as its small-amplitude limit. At finite $\delta$ the two integrals quietly do everything the tangent could not. A valve closed at its mean still has $F_0 \neq 0$: it opens during the part of the cycle when the swing carries it into its open band, and the resulting net rectified inflow is what charges the mean. The same valve has $N \neq 0$: its brief opening near one extreme of the swing responds coherently at the oscillation frequency, and that is what pumps the envelope. In the worked case of \texttt{describing\_function\_illustration.png} the opening occurs where the valve's own $\Delta P$ is smallest --- most flow when least pressure difference --- so $N < 0$, an effective negative resistance produced purely by the finite amplitude.
+
+\section*{6. The envelope law}
+
+\subsection*{6.1 The fast system and its characteristic cubic}
+
+The fast dynamics are now two equations --- (14) for the pressure fluctuation, and the fluctuating part of the piston equation (4), with the passive spring linearized:
+
+\begin{equation}
+\frac{dP'}{dt} = -\frac{k_{cv}}{A}\dot x' + gP', \qquad m\ddot x' + b\dot x' + k_{pass}x' = AP' \tag{18}
+\end{equation}
+
+Eliminate $P'$: differentiate the piston equation once, substitute $\dot P'$ from the first, then use the piston equation again to replace $AP'$. Writing $k = k_{cv}+k_{pass}$:
+
+\[
+m\dddot x' + (b - gm)\ddot x' + (k - gb)\dot x' - gk_{pass}x' = 0
+\]
+
+so $x' \propto e^{st}$ requires
+
+\begin{equation}
+ms^3 + (b - gm)s^2 + (k - gb)s - gk_{pass} = 0 \tag{19}
+\end{equation}
+
+\subsection*{6.2 Solving the cubic perturbatively}
+
+With $b = g = 0$, (19) is $s(ms^2 + k) = 0$: exact roots $0$ and $\pm i\omega_0$, $\omega_0^2 = k/m$ --- the undamped oscillator. The perturbations are tiny on the oscillator scale, and each for its own physical reason. $b/m = \omega_0/Q$ is small because the resonator is a good one ($Q \approx 60$ to $240$: it rings for many cycles). $g$ is small because the valves are tiny orifices feeding a large reservoir.
+
+ $\lambda$ then inherits smallness of these parameters: fast oscillation and slow growth of gas inside. 
+
+\[
+s = i\omega_0 + \lambda, \qquad \lambda \text{ small and a priori complex}
+\]
+
+Binomials with $i^2 = -1$, $i^3 = -i$, dropping quadratic-in-small terms: $s^2 = -\omega_0^2 + 2i\omega_0\lambda$ and $s^3 = -i\omega_0^3 - 3\omega_0^2\lambda$. Substitute into (19) and discard all products of two small quantities ($gb$, $\lambda b$, $\lambda g$, $\lambda^2$):
+
+\[
+\left[ik\omega_0 - im\omega_0^3\right] + \left[-3m\omega_0^2\lambda + k\lambda - (b - gm)\omega_0^2 - gk_{pass}\right] = 0
+\]
+
+Separating the real and complex part gives
+
+\[
+-2m\omega_0^2\lambda = (b - gm)\omega_0^2 + gk_{pass}
+\]
+
+\begin{equation}
+\lambda = -\frac{b}{2m} + \frac{g}{2}\cdot\frac{k_{cv}}{k_{cv}+k_{pass}} \tag{20}
+\end{equation}
+
+(the last step uses $m\omega_0^2 = k$ to combine $\frac g2 - \frac g2\frac{k_{pass}}{k} = \frac g2\frac{k_{cv}}{k}$). With $b = m\omega_0/Q$ the loss term is $\omega_0/2Q$. At finite amplitude $g = g(\bar P, \delta)$ from (17) --- the formula survives because its derivation used only linearity in the first harmonics, which (16) preserves by construction.
+
+\subsection*{6.3 From growth rate to envelope}
+
+Two independent facts combine into the envelope law. First, an eigenvalue is an amplitude law: the root $s = i\omega_0 + \lambda$ means the fast solution behaves as $x' \propto e^{st} = e^{\lambda t}e^{i\omega_0 t}$ --- a phase rotating at $\omega_0$ times a magnitude $e^{\lambda t}$ --- and the magnitude of the oscillation is exactly what $a$ names. So at frozen slow state, $\dot a = \lambda a$; under slow drift, $\lambda(\bar P, \delta)$ at the instantaneous state applies, with error of order $\varepsilon^2$ since the coefficients barely change within a cycle.
+
+Second, even with $\lambda = 0$ a drifting frequency changes the amplitude. Take the bare oscillator with slowly varying stiffness, $\ddot x' + \omega^2(t)x' = 0$, energy $E = \frac{1}{2}m\dot x'^2 + \frac{1}{2}m\omega^2x'^2$. Differentiate and use the equation of motion:
+
+\[
+\frac{dE}{dt} = m\dot x'\left(\ddot x' + \omega^2x'\right) + m\omega\dot\omega x'^2 = m\omega\dot\omega x'^2
+\]
+
+Cycle-average with $\langle x'^2\rangle = a^2/2$ and $E = \frac{1}{2}m\omega^2a^2$:
+
+\[
+\left\langle\frac{dE}{dt}\right\rangle = \frac{\dot\omega}{\omega}E \qquad\Longrightarrow\qquad \frac{d}{dt}\left(\frac{E}{\omega}\right) = \frac{\dot E}{\omega} - \frac{E\dot\omega}{\omega^2} = 0
+\]
+
+so $E/\omega$ is conserved under slow drift in a changing $\omega$. With $E/\omega = \frac{1}{2}m\omega a^2$ constant, $a \propto \omega^{-1/2}$, i.e. $\dot a/a = -\dot\omega/2\omega$: as the gas springs stiffen with the rising mean, the same oscillation energy fits into a smaller swing. Both effects are first order in $\varepsilon$, so they superpose:
+
+\begin{equation}
+\frac{da}{dt} = \left[\lambda(\bar P, \delta) - \frac{\dot\omega}{2\omega}\right]a \tag{21}
+\end{equation}
+
+This is linear in $a$, so it integrates exactly: $a(t) = a(0)\exp\int\left[\lambda - \dot\omega/2\omega\right]dt'$. The second piece is a perfect derivative ($\dot\omega/\omega = d\ln\omega/dt$), so its integral is $\frac12\ln(\omega(t)/\omega(0))$ regardless of the path, and exponentiating gives a square root. Converting to pressure amplitude with (11), whose coefficient $k_{cv}$ itself drifts:
+
+\begin{equation}
+\delta(t) = \delta(0)\cdot\frac{k_{cv}(t)}{k_{cv}(0)}\cdot\sqrt{\frac{\omega(0)}{\omega(t)}}\cdot\exp\left(\int_0^t\lambda(\bar P,\delta)dt'\right) \tag{22}
+\end{equation}
+
+Growth while $\lambda > 0$, decay while $\lambda < 0$; and because $N$ depends on $\delta$, the condition $\lambda(\bar P, \delta) = 0$ is solvable for $\delta$ --- the envelope self-limits, which is where limit cycles come from.
+
+\section*{7. The packet center}
+
+The fast problem is done. What remains is the slow drift of the mean state, and the operation is the mirror image of sections 4 to 6: we extract the slow, cycle averages. Two averaging facts do all the work below: the average of a lone oscillating factor is zero, and the average of a product of two oscillations keeps only their in-phase combination, worth one half of amplitude times amplitude.
+
+\subsection*{7.1 Mass}
+
+Average equation (1). Over one cycle the inflow waveform averages, by the definition (16), to exactly $F_{0,in}$ --- likewise the outlet:
+
+\begin{equation}
+\frac{d\bar M}{dt} = F_{0,in} - F_{0,out} \tag{23}
+\end{equation}
+
+Less trivial than it looks: these are the rectified flows, which can differ completely from the flow at the mean pressure --- a valve closed at its mean still passes net gas whenever the swing opens it for part of each cycle. That rectified trickle is what charges the mean.
+
+\subsection*{7.2 The flux term of the pressure equation}
+
+Average the first term of (7). Replace $1/V$ by $1/\bar V_{cv}$ and $T$ by $\bar T$ where they multiply the flows --- their fluctuating parts enter only through products with the flow fluctuation, percent-level corrections (sized in full notes 6.4) --- and average the flows as in 7.1:
+
+\[
+\left\langle\frac{\gamma R}{V}\left(F_{in}T_{in} - F_{out}T\right)\right\rangle = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}F_{0,in} - \bar TF_{0,out}\right)
+\]
+
+\subsection*{7.3 The work term: displacement work plus acoustic power}
+
+Write $P = \bar P + P'$ and $\dot V = d\bar V_{cv}/dt + \dot V'$ and multiply out. Four products: the two cross terms each contain one lone oscillating factor and average to zero; what survives is
+
+\[
+\left\langle P\dot V\right\rangle = \bar P\frac{d\bar V_{cv}}{dt} + \left\langle P'\dot V'\right\rangle
+\]
+
+--- work pushing the slowly drifting mean piston position, plus the net work per cycle exchanged with the oscillation itself (the acoustic power).
+
+The acoustic power needs one short computation. If the pressure fluctuation were purely the gas-spring response (10), $P' \propto -x'$, it would sit a quarter cycle out of phase with the velocity $\dot x'$ --- velocity is the derivative of displacement, and differentiating a sinusoid shifts its phase by a quarter cycle ($x' \propto \cos\phi$ gives $\dot x' \propto -\sin\phi$); physically, spring pressure peaks at the turning points where the piston is momentarily at rest, and vanishes at mid-stroke where the piston is fastest. The in-phase rule above then gives $\langle P'\dot x'\rangle \propto \langle\cos\phi\sin\phi\rangle = 0$: a pure spring stores work on compression and returns all of it on expansion --- lossless by phase, like a capacitor whose current and voltage sit ninety degrees apart. So the entire effect comes from the small valve correction. Solve the fast pressure equation (14) for the complex amplitudes (substitute $P' = \mathrm{Re}[\hat pe^{i\phi}]$, $x' = \mathrm{Re}[\hat xe^{i\phi}]$, so $d/dt \to i\omega$):
+
+\[
+i\omega\hat p = -\frac{k_{cv}}{A}i\omega\hat x + g\hat p \qquad\Longrightarrow\qquad \hat p = -\frac{k_{cv}}{A}\hat x + i\frac{gk_{cv}}{\omega A}\hat x + O(g^2/\omega^2)
+\]
+
+The first piece is the spring --- in phase with $x'$, no net work. The second carries a factor $i$: shifted a quarter cycle, hence in phase with the velocity --- this is the piece that works. With the product rule $\langle q_1q_2\rangle = \frac{1}{2}\mathrm{Re}[\hat q_1\hat q_2^*]$ and velocity amplitude $i\omega\hat x$:
+
+\begin{equation}
+\left\langle P'\dot V'\right\rangle = A\left\langle P'\dot x'\right\rangle = \frac{gk_{cv}}{2}a^2 = \frac{g\bar V_{cv}}{2\gamma\bar P}\delta^2 \tag{24}
+\end{equation}
+
+(conversion by (11) and the definition of $k_{cv}$). Sign reading: when $g > 0$ the mean state loses pressure paying for the growing oscillation; during decay, $g < 0$, the oscillation pays it back.
+
+\subsection*{7.4 The mean piston: quasi-static balance}
+
+Average the piston equation (4): $m \cdot d^2\bar x/dt^2 + b \cdot d\bar x/dt = A(\bar P - \bar P_{pass})$. The left side involves only slow rates --- smaller than the pressure-force scale by order $\varepsilon$ and $\varepsilon^2$ --- so to leading order the mean piston position sits, at every instant, where the two mean pressures balance:
+
+\[
+\bar P_{pass}(\bar x) = \bar P
+\]
+
+As the CV charges, the piston slides toward the passive side, compressing it until its pressure catches up (this drifting equilibrium is what a rolling-median baseline tracks). Because the passive side is the sealed adiabat (5), the balance inverts in closed form:
+
+\begin{equation}
+\bar V_{pass} = V_{0p}\left(\frac{P_{p0}}{\bar P}\right)^{1/\gamma}, \qquad \bar V_{cv} = V_{0c} + V_{0p} - \bar V_{pass}, \qquad \frac{d\bar V_{cv}}{d\bar P} = \frac{\bar V_{pass}}{\gamma\bar P} \tag{25}
+\end{equation}
+
+The middle relation holds because the total geometric volume $V_{0c} + V_{0p}$ is fixed: whatever the passive side loses, the CV gains. The derivative is kept because 7.5 needs it.
+
+\subsection*{7.5 Assemble}
+
+Insert 7.2 and 7.3 into the average of (7):
+
+\[
+\frac{d\bar P}{dt} = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}F_{0,in} - \bar TF_{0,out}\right) - \frac{\gamma\bar P}{\bar V_{cv}}\frac{d\bar V_{cv}}{dt} - \frac{\gamma}{\bar V_{cv}}\left\langle P'\dot V'\right\rangle
+\]
+
+The middle term is not independent of the left side: by the chain rule and (25), $d\bar V_{cv}/dt = (\bar V_{pass}/\gamma\bar P)(d\bar P/dt)$, so that term equals $(\bar V_{pass}/\bar V_{cv})(d\bar P/dt)$. Move it across and factor:
+
+\[
+\frac{d\bar P}{dt}\left(1 + \frac{\bar V_{pass}}{\bar V_{cv}}\right) = \frac{\gamma R}{\bar V_{cv}}\left(T_{in}F_{0,in} - \bar TF_{0,out}\right) - \frac{g\delta^2}{2\bar P}
+\]
+
+(the last term is (24) times $\gamma/\bar V_{cv}$). Multiply through by $\bar V_{cv}$ and divide:
+
+\begin{equation}
+\frac{d\bar P}{dt} = \frac{\gamma R\left(T_{in}F_{0,in} - \bar TF_{0,out}\right) - \bar V_{cv}g\delta^2/2\bar P}{\bar V_{cv} + \bar V_{pass}} \tag{26}
+\end{equation}
+
+Note that both volumes in (26) are not additional unknowns: they are evaluated from (25) at the current $\bar P$ --- algebraic functions of the mean pressure, recomputed at every instant of the integration (the passive volume from the balance-and-adiabat inversion, the CV volume as the remainder of the fixed total $V_{0c} + V_{0p}$). The effective volume is the sum $\bar V_{cv} + \bar V_{pass}$ because the quasi-static piston transmits pressure: charging the CV inflates both springs, so the mean rises at roughly half the rate a rigid CV would (for equal volumes). The set closes with the mean gas law $\bar T = \bar P\bar V_{cv}/\bar MR$.
+
+\section*{8. The packet, assembled}
+
+Three slow ODEs --- (23) for $\bar M$, (26) for $\bar P$, (21) for $a$ --- with the algebra (25), (12), (20), (17), (16), and $\delta = k_{cv}a/A$. Then
+
+\begin{equation}
+P_{cv}(t) = \bar P(t) + \delta(t)\cos\left(\phi_0 + \int_0^t\omega(\bar P)dt'\right) \tag{27}
+\end{equation}
+
+with $T$ and $x$ slaved by section 4. The life of the packet is read off $\lambda$ and the drift: ignition while $\lambda > 0$; a limit cycle where the trajectory settles on the locus $\lambda(\bar P, \delta) = 0$ (your notebook's $V_{0,cv} = 1\times10^{-4}$ case --- amplitude predicted 0.2947 bar, simulated 0.2946); turnover and collapse when the charging mean drags the valves out of their pumping band; a parabolic landing $P_{in} - \bar P \propto (t^\ast - t)^2$ once only the inlet trickles (integrate (26) with $F_0 \propto \sqrt{P_{in}-\bar P}$, substitute $y = \sqrt{P_{in}-\bar P}$); and ring-down $\delta \propto e^{-\omega t/2Q}$ when the valves disengage. Against full simulations, thesis parameters and your notebook's variant alike: mean within 0.003 bar, envelope 1 to 3 percent, frequency within 0.25 Hz.
+
+\end{document}

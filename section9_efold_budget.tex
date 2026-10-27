@@ -1,0 +1,104 @@
+% ---------------------------------------------------------------------------
+% Section 9 for Separation_of_scales.tex: growth or stall, the e-fold budget.
+% Paste before \end{document}. Equation numbers continue from (27).
+% ---------------------------------------------------------------------------
+\section*{9. Growth or stall: the e-fold budget}
+
+\subsection*{9.1 The question}
+
+Integrating (21) from the kick to a time $t$ gives $\ln\left(\delta(t)/\delta_0\right) = \int_0^t \lambda\,dt'$ (the factor $k_{cv}(t)/k_{cv}(0)$ of (22) stays within one percent over the times that matter and is dropped). The sign of $\lambda$ at $t = 0$ does not decide the outcome: in the 37 settings of the sweep notebook, 11 of the 14 stall cases start with $\lambda_0 > 0$. What decides it is a race. The oscillation must reach the limit-cycle amplitude $\delta_\infty$ --- the locus $\lambda(\bar P, \delta) = 0$ of section 8 --- before the drift of $\bar P$ carries the reeds out of their pumping band. So the question is how many e-folds $\lambda$ can deliver before the drift takes the drive away, against how many the kick needs, $\ln(\delta_\infty/\delta_0)$.
+
+\subsection*{9.2 The small-amplitude gain is the slope of the net inflow}
+
+Put $\bar T = T_{in}$ in (14) and write $c^2 \equiv \gamma R T_{in}$ (the speed of sound squared). Since $d\dot m(P_{in} - \bar P)/d\bar P = -\dot m'_{in}$ and $d\dot m(\bar P - P_{out})/d\bar P = +\dot m'_{out}$,
+\begin{equation}
+g_{lin}(\bar P) = -\frac{c^2}{\bar V_{cv}}\left(\dot m'_{in} + \dot m'_{out}\right) = \frac{c^2}{\bar V_{cv}}\,\frac{d\dot m_{net}}{d\bar P}, \qquad \dot m_{net}(\bar P) \equiv \dot m(P_{in} - \bar P) - \dot m(\bar P - P_{out}) . \tag{28}
+\end{equation}
+The valves pump exactly when a higher mean pressure admits more net gas --- the same slope that makes the filling accelerate. With (15),
+\begin{equation}
+\frac{d\dot m_{net}}{d\bar P} = \frac{c_1\dot m_{max}}{2\Delta P_{max}}\left[\frac{3u_{in}-1}{\sqrt{u_{in}}} + \frac{3u_{out}-1}{\sqrt{u_{out}}}\right], \qquad u_{in} = \frac{P_{in} - \bar P}{\Delta P_{max}}, \quad u_{out} = \frac{\bar P - P_{out}}{\Delta P_{max}}, \tag{29}
+\end{equation}
+a bracket term being absent while its reed is shut ($u \ge 1$). Inserting (28) into (20), with $f \equiv k_{cv}/(k_{cv} + k_{pass}) = \bar V_{pass}/(\bar V_{cv} + \bar V_{pass})$ from (10) and (12),
+\begin{equation}
+\lambda_{lin}(\bar P) = -\frac{b}{2m} + \frac{f}{2}\,\frac{c^2}{\bar V_{cv}}\,\frac{d\dot m_{net}}{d\bar P} . \tag{30}
+\end{equation}
+
+\subsection*{9.3 The drift without oscillation}
+
+With $\delta = 0$ and $\bar T = T_{in}$, the rectified flows in (26) are the flows at the mean pressure and (26) reads
+\begin{equation}
+\frac{d\bar P}{dt} = \frac{\dot m_{net}(\bar P)}{C}, \qquad C \equiv \frac{\bar V_{cv} + \bar V_{pass}}{c^2} . \tag{31}
+\end{equation}
+
+\subsection*{9.4 The budget}
+
+Define $B \equiv \int_0^{t_1}\lambda_{lin}\,dt$, where $t_1$ is the first time at which $\lambda_{lin}$ reaches zero, and let $\bar P_1 \equiv \bar P(t_1)$ be the mean pressure at that moment.
+
+\paragraph{Finding $\bar P_1$ without integrating in time.} Write the growth rate (30), with the slope (29), as
+\begin{equation}
+\lambda_{lin}(\bar P) = \Lambda\left[X(\bar P) - X^*\right], \qquad X(\bar P) = h(u_{in}) + h(u_{out}), \qquad
+h(u) = \begin{cases} \dfrac{3u-1}{\sqrt u}, & 0 < u < 1, \\[6pt] 0, & u \ge 1 \ \text{(reed shut)}, \end{cases} \tag{32a}
+\end{equation}
+\begin{equation}
+\Lambda \equiv \frac{f}{2}\,\frac{c^2}{\bar V_{cv}}\,\frac{c_1\dot m_{max}}{2\Delta P_{max}}, \qquad
+X^* \equiv \frac{b}{2m\Lambda} = \frac{2b\bar V_{cv}\Delta P_{max}}{m f c^2 c_1\dot m_{max}} . \tag{32b}
+\end{equation}
+$h(u)$ is one reed's flow slope in units of $c_1\dot m_{max}/2\Delta P_{max}$, signed so that $h > 0$ means the reed drives: $h > 0$ on the falling branch $\tfrac13 < u < 1$, $h < 0$ on the rising branch, $h \to -\infty$ as $u \to 0$ (the $\sqrt u$ law), $h \to 2$ as $u \to 1^-$, and $h = 0$ once the reed is pressed shut. The bracket $X$ depends only on where the reeds sit ($P_{in}$, $P_{out}$, $\Delta P_{max}$, $\bar P$); everything else --- damping, piston mass, volumes, valve capacity --- is collected in the threshold $X^*$, the drive the damping eats. So $\lambda_{lin} \le 0$ exactly when $X(\bar P) \le X^*$, and $\bar P_1$ follows in three steps.
+\begin{enumerate}
+\item \emph{Direction.} By (31), $\bar P$ rises if $\dot m_{net}(P_0) > 0$ and falls if $\dot m_{net}(P_0) < 0$. It never turns back inside the window: there $X > X^* > 0$, so $d\dot m_{net}/d\bar P > 0$ and, by (31), $d|\dot m_{net}|/dt = (d\dot m_{net}/d\bar P)\,|\dot m_{net}|/C > 0$. Physically, for identical reeds inflow and outflow balance at $P_b = (P_{in} + P_{out})/2$, and while the reeds drive this balance is unstable: the mean runs away from $P_b$ at the rate $(d\dot m_{net}/d\bar P)/C$, fed by the same slope that pumps the oscillation (9.2\,s$^{-1}$ in the baseline, against $\lambda_{lin}(P_0) = 7.3$\,s$^{-1}$). A resonator that starts above $P_b$ fills, one that starts below drains. Because $\bar P(t)$ is monotone, ``the first time with $\lambda_{lin} \le 0$'' is ``the first pressure along the drift with $X \le X^*$''.
+\item \emph{Scan.} Starting at $P_0$, step $\bar P$ in that direction and evaluate $u_{in} = (P_{in} - \bar P)/\Delta P_{max}$, $u_{out} = (\bar P - P_{out})/\Delta P_{max}$ and $X(\bar P)$. Since $h$ increases with $u$, filling lowers the inlet term (which crosses zero at $u_{in} = \tfrac13$ and then plunges) and raises the outlet term (towards 2); draining does the opposite.
+\item \emph{Stop} at the first $\bar P$ with $X(\bar P) \le X^*$. It is reached in one of two ways:
+\begin{itemize}
+\item \emph{continuously}: $X$ slides down through $X^*$, and $\bar P_1$ is the root of $X(\bar P) = X^*$;
+\item \emph{by a jump}: a reed is pressed shut ($u$ reaches 1) and its term drops from 2 to 0 --- the outlet at $\bar P = P_{out} + \Delta P_{max}$ when filling, the inlet at $\bar P = P_{in} - \Delta P_{max}$ when draining. If $X - 2 \le X^*$ after the drop, $\lambda_{lin}$ jumps from positive to negative and $\bar P_1$ is that shut pressure. If $X - 2 > X^*$, the other reed still out-drives the damping and the scan continues.
+\end{itemize}
+\end{enumerate}
+
+Figure~\ref{fig:P1scan} shows the four cases. \emph{Baseline} ($\zeta = 0.6$, $P_{in} = 6$ bar, $\Delta P_{max} = 0.458$ bar, $X^* = 0.38$): $P_0 = 5.75$ bar lies above $P_b = 5.725$ bar, so the resonator fills; $X$ falls from 2.05 at $P_0$ to 1.11 just below the outlet's shut pressure 5.908 bar without reaching $X^*$; there it drops to $-0.89$ and $\lambda_{lin}$ jumps from $+3.2$ to $-5.6$\,s$^{-1}$, so $\bar P_1 = 5.908$ bar. \emph{A quarter of the valve capacity, or four times the damping}: the bracket is unchanged but $X^* = 1.52$, which $X$ crosses continuously at $\bar P_1 = 5.873$ bar. \emph{$\zeta = 0.8$} ($\Delta P_{max} = 0.344$ bar, $X^* = 0.28$): the outlet shuts first, at 5.794 bar, but $X$ only drops from 3.03 to 1.03, still above $X^*$; the inlet alone keeps driving until $X = X^*$ at $\bar P_1 = 5.865$ bar. \emph{$P_{in} = 6.2$ bar} ($\Delta P_{max} = 0.625$ bar, $P_b = 5.825$ bar, $X^* = 0.52$): $P_0$ lies below $P_b$, the resonator drains, and the window closes when the inlet reed is pressed shut at $\bar P_1 = P_{in} - \Delta P_{max} = 5.575$ bar.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{fig_P1_scan.pdf}
+\caption{Finding $\bar P_1$. Solid black: the bracket $X(\bar P)$ along the scan from $P_0$ (faint beyond $\bar P_1$); dotted: a reed being pressed shut; dashed: the damping threshold $X^*$; dots: $\bar P_1$. $P_b$ is the balance pressure where $\dot m_{net} = 0$.}
+\label{fig:P1scan}
+\end{figure}
+
+Substituting $dt = C\,d\bar P/\dot m_{net}$ from (31) into the second term of (30),
+\begin{equation}
+\int_0^{t_1}\frac{f c^2}{2\bar V_{cv}}\frac{d\dot m_{net}}{d\bar P}\,dt = \frac{f c^2 C}{2\bar V_{cv}}\int_{\dot m_{net}(P_0)}^{\dot m_{net}(\bar P_1)}\frac{d\dot m_{net}}{\dot m_{net}} = \frac{\bar V_{pass}}{2\bar V_{cv}}\,\ln\frac{\dot m_{net}(\bar P_1)}{\dot m_{net}(P_0)}, \tag{32}
+\end{equation}
+where $P_0 = \bar P(0)$ and the prefactor collapses because $f$ and $C$ contain the same combination of volumes. Hence
+\begin{equation}
+B = \frac{\bar V_{pass}}{2\bar V_{cv}}\,\ln\frac{\dot m_{net}(\bar P_1)}{\dot m_{net}(P_0)} - \frac{b}{2m}\,t_1, \qquad t_1 = C\int_{P_0}^{\bar P_1}\frac{d\bar P}{\dot m_{net}(\bar P)} . \tag{33}
+\end{equation}
+The only piece left to a quadrature is the drift time $t_1$. The criterion is
+\begin{equation}
+B > \ln\frac{\delta_\infty}{\delta_0}: \ \text{steady oscillation}, \qquad B < \ln\frac{\delta_\infty}{\delta_0}: \ \text{stall}, \tag{34}
+\end{equation}
+with $\delta_0 = k_{cv}a_0/A$ the amplitude of the kick ($a_0 = v_0/\omega_0$ for a velocity kick $v_0$).
+
+Reading of (33): every e-fold by which the net inflow grows during the window buys $\bar V_{pass}/2\bar V_{cv}$ e-folds of oscillation, and the damping costs $b/2m$ per second of drift. The flow ratio does not contain $c_1\dot m_{max}$ --- the valve capacity enters only through $t_1$ --- while the prefactor is the volume ratio.
+
+\subsection*{9.5 Baseline numbers}
+
+Baseline of the sweep notebooks: $P_{in} = 6.0$ bar, $P_{out} = 5.45$ bar, $P_0 = P_{p0} = 5.75$ bar, $\Delta P_{max} = 0.458$ bar, $V_{0c} = 10^{-4}$ m$^3$, $V_{0p} = 2\times10^{-4}$ m$^3$, $m = 1.5$ g, $b = 0.005$ N\,s/m, $T_{in} = 300$ K, and a flow law with $c_1\dot m_{max} = 1$ g/s (peak flow $\dot m_{max} = 0.385$ g/s). The notebook's $k_{cv}$ uses $\gamma_E = 1 + R/c_v$ in place of $\gamma$, which makes its $f = 0.663$ and its prefactor in (33) equal to $0.98$ instead of $1$; the numbers below are the notebook's.
+
+At $P_0$: $u_{in} = 0.545$, $u_{out} = 0.655$, bracket in (29) $= 0.862 + 1.191 = 2.053$, $c_1\dot m_{max}/2\Delta P_{max} = 1.09\times10^{-8}$ kg\,s$^{-1}$Pa$^{-1}$, so $d\dot m_{net}/d\bar P = 2.24\times10^{-8}$ kg\,s$^{-1}$Pa$^{-1}$ --- 0.22 g/s more net inflow per 0.1 bar. With $c^2/\bar V_{cv} = 1.21\times10^{9}$ m$^{-1}$s$^{-2}$, $g_{lin} = 27.2$ s$^{-1}$ and $\lambda_{lin}(0) = -1.67 + 9.01 = 7.34$ s$^{-1}$ (3.78 from the inlet reed, 5.23 from the outlet reed). The window closes when the outlet reed shuts (section 9.4, Fig.~\ref{fig:P1scan}a): $\bar P_1 = 5.908$ bar, where $\dot m_{net} = \dot m_{in}(u_{in} = 0.2) = 0.358$ g/s against $0.056$ g/s at $P_0$ --- ratio 6.36, logarithm 1.85, drive part $0.98\times1.85 = 1.82$ e-folds. $t_1 = 0.223$ s, damping part $-0.37$. $B = 1.45$; integrating (23) and (26) numerically with the temperature equation and the moving piston gives $1.42$. Need: a 5 m/s kick gives $\delta_0 = 0.140$ bar and $\delta_\infty = 0.295$ bar, so $\ln(\delta_\infty/\delta_0) = 0.74 < 1.45$, steady; a 1 m/s kick gives $\delta_0 = 0.028$ bar, $2.35 > 1.45$, stall; 2.5 m/s gives $1.43$, the threshold (the full simulation puts it between 2.6 and 2.7 m/s).
+
+\subsection*{9.6 What the approximations cost, and the check}
+
+\textbf{$\bar T = T_{in}$.} $\bar T$ enters the outlet term of (14) and the flux term of (26). Without oscillation, (1)--(3) give $c_v\bar M\,d\bar T/dt = R T_{in}\dot m_{net} - \bar P\,d\bar V_{cv}/dt$ at $\bar T = T_{in}$; with (25) and (31) the work term removes the fraction $\bar V_{pass}/(\bar V_{cv} + \bar V_{pass})$ of the enthalpy heating, so
+\[
+\frac{d\bar T}{dt} = (\gamma - 1)\,T_{in}\,\frac{\dot m_{net}}{\bar M}\,\frac{\bar V_{cv}}{\bar V_{cv} + \bar V_{pass}} .
+\]
+Over the window the mass rises by 6 percent, so $\bar T$ rises by $0.41\times300\times0.06/3 \approx 2.5$ K (2.5 K in the integration): $\bar T/T_{in}$ deviates from 1 by 0.8 percent at most, and pinning $\bar T = T_{in}$ changes $B$ by 0.6 percent (1.415 against 1.423). Exactly, (28) and (31) hold with $\dot m_{net}$ replaced by $\dot m_{in} - (\bar T/T_{in})\dot m_{out}$, and the logarithm in (32) acquires the correction $\int(\dot m_{out}/\dot m_{net})\,d\bar T/T_{in}$, which is that 0.6 percent.
+
+\textbf{Fixed volumes.} The piston travels 13 mm over the window, $\bar V_{cv}$ grows by 4 percent and $f$ falls from 0.663 to 0.650; holding them at their initial values raises $B$ by 2.3 percent. The two simplifications have opposite signs, and together they are the 1.8 percent between 1.45 and 1.42.
+
+\textbf{Small-signal $\lambda$.} $\lambda$ falls with $\delta$ through $N(\delta)$, so $B$ is an upper bound on the growth actually realized; the criterion (34) errs on the optimistic side close to the line.
+
+\textbf{A window must exist.} If $\lambda_{lin}(P_0) < 0$ --- both reeds shut at $P_0$, as for $\zeta = 1.2$ where $\Delta P_{max} = 0.229$ bar is below both drops, or $b$ too large --- (33) does not apply; a finite kick may still open the reeds, and the outcome is then a question for (17).
+
+\textbf{How the window closes in the sweeps.} Of the 37 settings of the sweep notebook, 26 close by the outlet reed shutting ($\bar P_1 = P_{out} + \Delta P_{max}$), 7 by a continuous root (low valve capacity, high damping, light piston, and $\zeta \ne 0.6$, where the outlet either never shuts below $P_{in}$ or has already shut and the inlet reed alone sets the root), 2 by the inlet reed shutting on a draining resonator ($P_{in} = 6.2$ and $6.5$ bar, $\bar P_1 = P_{in} - \Delta P_{max}$), and 2 have no window. The scan above and the notebook's route --- integrating (23) and (26) with $\delta = 0$ and stopping at the first zero of $\lambda_{lin}$ --- give the same $\bar P_1$ to within 0.006 bar. $\bar P_1$ is a property of the drift without oscillation: in the full simulation the steady runs never reach it (the growing oscillation stops the mean below 5.79 bar and settles it at 5.72 bar), and the stall runs turn over a little before it, the closer the smaller their swing (5.896 bar at a 49 mbar swing for $v_0 = 0.5$ m/s, 5.826 bar at 200 mbar for $v_0 = 2.5$ m/s), because a finite swing lowers the gain below its small-signal value.
+
+\textbf{Check.} Applied to the 37 full simulations of the sweep notebook (\texttt{lambda\_growth\_rate\_check.ipynb}, section 5, with $\delta_\infty = 0.295$ bar), (34) is right in 35 cases. The two misses are $P_{in} = 6.2$ bar, 0.03 e-folds on the wrong side (the 2.5 m/s kick sits 0.01 e-folds on the right side, so the line is sharp to a few hundredths), and $\zeta = 1.2$, which has no window. The closed form (33) reproduces the budget obtained by integrating the slow equations to within 0.03 e-folds in 35 settings, and to 0.09 and 0.34 e-folds for $V_{0p} = 4$ and $8\times10^{-4}$ m$^3$, where the piston travels farthest.
